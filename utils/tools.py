@@ -14,3 +14,12 @@ def random_seed(n):
     np.random.seed(n)
     torch.manual_seed(n)
     torch.cuda.manual_seed_all(n)
+
+
+def sche_dict(args):
+    args_dict = vars(args)
+    sche = {}
+    for k, v in args_dict.items():
+        if k.startswith('sche_'):
+            sche[k] = v
+    return sche

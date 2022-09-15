@@ -7,13 +7,15 @@ import math
 
 
 class PolyLR(object):
-    def __init__(self, optimizer, num_epochs, base_lr, *args, **kwargs):
+    def __init__(self, optimizer, num_epochs, base_lr, **kwargs):
         super(PolyLR, self).__init__()
         self.optimizer = optimizer
         self.num_epochs = num_epochs
         self.base_lr = base_lr
-        for k, v in kwargs.items():
-            self.power = v
+        if 'sche_power' in kwargs:
+            self.power = kwargs['sche_power']
+        else:
+            self.power = 1.0
 
     def step(self, epoch):
         lr = self.base_lr * (1 - epoch / self.num_epochs) ** self.power
@@ -22,13 +24,15 @@ class PolyLR(object):
 
 
 class CosineAnnealingLR(object):
-    def __init__(self, optimizer, num_epochs, base_lr, *args, **kwargs):
+    def __init__(self, optimizer, num_epochs, base_lr, **kwargs):
         super(CosineAnnealingLR, self).__init__()
         self.optimizer = optimizer
         self.num_epochs = num_epochs
         self.base_lr = base_lr
-        for k, v in kwargs.items():
-            self.min_lr = v
+        if 'sche_min_lr' in kwargs:
+            self.min_lr = kwargs['sche_min_lr']
+        else:
+            self.min_lr = 1e-5
 
     def step(self, epoch):
         lr = self.min_lr + ((self.base_lr - self.min_lr) / 2) * (1 + math.cos(epoch / self.num_epochs * math.pi))

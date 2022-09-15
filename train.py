@@ -4,16 +4,15 @@
 # @File    : train.py
 # @Software: PyCharm
 import os
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 from torch.nn import init
-from torch.optim import lr_scheduler
 import torch.distributed
 
 from utils.metric import *
 from utils.logs import *
 from utils.save_model import *
-from utils.scheduler import *
 from utils.drawing import *
 from utils.tools import *
 from parse.parse_args_train import parse_args
@@ -71,7 +70,7 @@ class Train(object):
         print("Model Initializing")
         self.criterion = build_criterion(args.criterion)
         self.optimizer = build_optimizer(args.optimizer, self.model, args.lr)
-        self.scheduler = build_scheduler(args.scheduler, self.optimizer, args.epochs, args.lr)
+        self.scheduler = build_scheduler(args.scheduler, self.optimizer, args.epochs, args.lr, **sche_dict(args))
 
         self.iou_metric = SigmoidMetric()
         self.nIoU_metric = SamplewiseSigmoidMetric(1, score_thresh=0.5)
