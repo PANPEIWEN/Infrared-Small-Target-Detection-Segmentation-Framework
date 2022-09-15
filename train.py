@@ -6,7 +6,7 @@
 import os
 import math
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '5,6'
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 from torch.nn import init
 from torch.optim import lr_scheduler
@@ -195,19 +195,15 @@ class Train(object):
                 _, nIoU = self.nIoU_metric.get()
                 _, _, _, _, F1_score = self.ROC.get()
                 if args.local_rank <= 0:
-                    msg = 'Epoch %d/%d, Iter %d/%d, test loss %.4f, mIoU %.4f, nIoU %.4f, F1-score %.4f, ' \
+                    msg = 'Epoch %d/%d, test loss %.4f, mIoU %.4f, nIoU %.4f, F1-score %.4f, ' \
                           'best_mIoU %.4f, ' \
                           'best_nIoU %.4f, best_F1-score %.4f' % (
-                              epoch, args.epochs, i + 1,
-                              math.ceil(self.test_data_len / args.test_batch),
-                              np.mean(eval_losses), IoU, nIoU, F1_score, self.best_mIoU, self.best_nIoU, self.best_f1)
+                              epoch, args.epochs, np.mean(eval_losses), IoU, nIoU, F1_score, self.best_mIoU,
+                              self.best_nIoU, self.best_f1)
             if args.local_rank <= 0:
                 print(msg)
-                save_test_log(self.save_dir, epoch, args.epochs, i + 1,
-                              math.ceil(self.test_data_len /
-                                        args.test_batch),
-                              np.mean(eval_losses), IoU, nIoU, F1_score, self.best_mIoU, self.best_nIoU,
-                              self.best_f1)
+                save_test_log(self.save_dir, epoch, args.epochs, np.mean(eval_losses), IoU, nIoU, F1_score,
+                              self.best_mIoU, self.best_nIoU, self.best_f1)
             self.test_loss.append(np.mean(eval_losses))
             self.mIoU.append(IoU)
             self.nIoU.append(nIoU)

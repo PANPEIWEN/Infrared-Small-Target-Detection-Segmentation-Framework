@@ -37,14 +37,14 @@ def save_train_log(save_dir, epoch, epochs, iter, iters, loss):
     return
 
 
-def save_test_log(save_dir, epoch, epochs, iter, iters, loss, mIoU, nIoU, f1, best_miou, best_niou, best_f1):
+def save_test_log(save_dir, epoch, epochs, loss, mIoU, nIoU, f1, best_miou, best_niou, best_f1):
     with open('work_dirs/%s/train_log.txt' % save_dir, 'a') as f:
         now = datetime.now()
         dt_string = now.strftime("%Y/%m/%d  %H:%M:%S  ")
         f.write(dt_string)
-        f.write('Epoch: [%d/%d]  Iter[%d/%d]  Loss: %.4f  mIoU: %.4f  nIoU: %.4f  F1-score: %.4f  '
+        f.write('Epoch: [%d/%d]  Loss: %.4f  mIoU: %.4f  nIoU: %.4f  F1-score: %.4f  '
                 'Best_mIoU: %.4f  Best_nIoU: %.4f  Best_F1-score: %.4f' % (
-            epoch, epochs, iter, iters, loss, mIoU, nIoU, f1, best_miou, best_niou, best_f1))
+            epoch, epochs, loss, mIoU, nIoU, f1, best_miou, best_niou, best_f1))
         f.write('\n')
     return
 
