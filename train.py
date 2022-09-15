@@ -4,8 +4,6 @@
 # @File    : train.py
 # @Software: PyCharm
 import os
-import math
-
 os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 from torch.nn import init
@@ -24,6 +22,7 @@ from build.build_model import build_model
 from build.build_criterion import build_criterion
 from build.build_optimizer import build_optimizer
 from build.build_dataset import build_dataset
+from build.build_scheduler import build_scheduler
 
 
 class Train(object):
@@ -72,9 +71,7 @@ class Train(object):
         print("Model Initializing")
         self.criterion = build_criterion(args.criterion)
         self.optimizer = build_optimizer(args.optimizer, self.model, args.lr)
-        if args.scheduler == 'CosineAnnealingLR':
-            self.scheduler = lr_scheduler.CosineAnnealingLR(
-                self.optimizer, T_max=args.epochs, eta_min=args.min_lr)
+        self.scheduler = build_scheduler(args.scheduler, self.optimizer, args.epochs, args.lr)
 
         self.iou_metric = SigmoidMetric()
         self.nIoU_metric = SamplewiseSigmoidMetric(1, score_thresh=0.5)
@@ -142,12 +139,7 @@ class Train(object):
                 save_train_log(self.save_dir, epoch, args.epochs, i + 1,
                                self.train_data_len / args.train_batch / args.num_gpu,
                                np.mean(losses))
-        if args.scheduler == 'CosineAnnealingLR':
-            self.scheduler.step()
-        elif args.scheduler == 'PolyLR':
-            PolyLR(self.optimizer, epoch, args.epochs, args.lr, power=1.0)
-        # if epoch % 501 == 0:
-        #     self.optimizer.param_groups[0]['lr'] *= 0.1
+        self.scheduler.step(epoch)
         if args.local_rank <= 0:
             save_ckpt({
                 'epoch': epoch,
