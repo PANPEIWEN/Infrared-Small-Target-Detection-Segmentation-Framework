@@ -10,9 +10,86 @@ import os
 from PIL import Image, ImageOps, ImageFilter
 import torchvision.transforms as transforms
 import torch.utils.data as Data
-import torch.nn as nn
 import torch
 import numpy as np
+
+
+class DatasetLoad(Data.Dataset):
+    def __init__(self, dataset_name, base_size, crop_size, mode, data_aug=True, suffix='png',
+                 base_dir='/data1/ppw/works/All_ISTD/datasets'):
+        self.base_size = base_size
+        self.crop_size = crop_size
+        self.mode = mode
+        self.data_aug = data_aug
+        assert mode in ['train', 'test'], 'The mode should be train or test'
+        if mode == 'train':
+            self.data_dir = osp.join(base_dir, dataset_name, 'trainval')
+        else:
+            self.data_dir = osp.join(base_dir, dataset_name, 'test')
+
+        self.img_names = []
+        for img in os.listdir(osp.join(self.data_dir, 'images')):
+            if img.endswith(suffix):
+                self.img_names.append(img)
+
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
+        ])
+
+    def _sync_transform(self, img, mask):
+        if self.mode == 'train' and self.data_aug:
+            if random.random() < 0.5:
+                img = img.transpose(Image.FLIP_LEFT_RIGHT)
+                mask = mask.transpose(Image.FLIP_LEFT_RIGHT)
+            crop_size = self.crop_size
+            long_size = random.randint(
+                int(self.base_size * 0.5), int(self.base_size * 2.0))
+            w, h = img.size
+            if h > w:
+                oh = long_size
+                ow = int(1.0 * w * long_size / h + 0.5)
+                short_size = ow
+            else:
+                ow = long_size
+                oh = int(1.0 * h * long_size / w + 0.5)
+                short_size = oh
+            img = img.resize((ow, oh), Image.BILINEAR)
+            mask = mask.resize((ow, oh), Image.NEAREST)
+            if short_size < crop_size:
+                padh = crop_size - oh if oh < crop_size else 0
+                padw = crop_size - ow if ow < crop_size else 0
+                img = ImageOps.expand(img, border=(0, 0, padw, padh), fill=0)
+                mask = ImageOps.expand(mask, border=(0, 0, padw, padh), fill=0)
+            w, h = img.size
+            x1 = random.randint(0, w - crop_size)
+            y1 = random.randint(0, h - crop_size)
+            img = img.crop((x1, y1, x1 + crop_size, y1 + crop_size))
+            mask = mask.crop((x1, y1, x1 + crop_size, y1 + crop_size))
+            if random.random() < 0.5:
+                img = img.filter(ImageFilter.GaussianBlur(radius=random.random()))
+            img, mask = np.array(img), np.array(mask)
+            img = self.transform(img)
+            mask = transforms.ToTensor()(mask)
+        else:
+            img = img.resize((self.base_size, self.base_size), Image.BILINEAR)
+            mask = mask.resize((self.base_size, self.base_size), Image.NEAREST)
+            img, mask = np.array(img), np.array(mask)
+            img = self.transform(img)
+            mask = transforms.ToTensor()(mask)
+        return img, mask
+
+    def __getitem__(self, item):
+        img_name = self.img_names[item]
+        img_path = osp.join(self.data_dir, 'images', img_name)
+        label_path = osp.join(self.data_dir, 'masks', img_name)
+        img = Image.open(img_path).convert('RGB')
+        mask = Image.open(label_path)
+        img, mask = self._sync_transform(img, mask)
+        return img, mask
+
+    def __len__(self):
+        return len(self.img_names)
 
 
 # SIRST_8000
@@ -47,132 +124,6 @@ class SirstAugDataset(Data.Dataset):
         mask = Image.open(label_path)
 
         img, mask = self.transform(img), transforms.ToTensor()(mask)
-        return img, mask
-
-    def __len__(self):
-        return len(self.names)
-
-
-class SirstAugDataset_192(Data.Dataset):
-    def __init__(self, base_dir='/data/panpw/works/Infrared/All_ISTD/datasets/SIRST_8000', mode='train'):
-        assert mode in ['train', 'test']
-
-        if mode == 'train':
-            self.data_dir = osp.join(base_dir, 'trainval')
-        elif mode == 'test':
-            self.data_dir = osp.join(base_dir, 'test')
-        else:
-            raise NotImplementedError
-
-        self.names = []
-        for filename in os.listdir(osp.join(self.data_dir, 'images')):
-            if filename.endswith('png'):
-                self.names.append(filename)
-
-        self.transform = transforms.Compose([
-            transforms.Resize((192, 192)),
-            transforms.ToTensor(),
-            # Default mean and std
-            transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
-        ])
-
-        self.transform1 = transforms.Compose([
-            transforms.Resize((192, 192)),
-            transforms.ToTensor(),
-        ])
-
-    def __getitem__(self, i):
-        name = self.names[i]
-        img_path = osp.join(self.data_dir, 'images', name)
-        label_path = osp.join(self.data_dir, 'masks', name)
-
-        img = Image.open(img_path).convert('RGB')
-        mask = Image.open(label_path)
-        img, mask = self.transform(img), self.transform1(mask)
-        return img, mask
-
-    def __len__(self):
-        return len(self.names)
-
-
-class SirstAugDataset_384(Data.Dataset):
-    def __init__(self, base_dir='/data/panpw/works/Infrared/All_ISTD/datasets/SIRST_8000', mode='train'):
-        assert mode in ['train', 'test']
-
-        if mode == 'train':
-            self.data_dir = osp.join(base_dir, 'trainval')
-        elif mode == 'test':
-            self.data_dir = osp.join(base_dir, 'test')
-        else:
-            raise NotImplementedError
-
-        self.names = []
-        for filename in os.listdir(osp.join(self.data_dir, 'images')):
-            if filename.endswith('png'):
-                self.names.append(filename)
-
-        self.transform = transforms.Compose([
-            transforms.Resize((384, 384)),
-            transforms.ToTensor(),
-            # Default mean and std
-            transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
-        ])
-
-        self.transform1 = transforms.Compose([
-            transforms.Resize((384, 384)),
-            transforms.ToTensor(),
-        ])
-
-    def __getitem__(self, i):
-        name = self.names[i]
-        img_path = osp.join(self.data_dir, 'images', name)
-        label_path = osp.join(self.data_dir, 'masks', name)
-
-        img = Image.open(img_path).convert('RGB')
-        mask = Image.open(label_path)
-        img, mask = self.transform(img), self.transform1(mask)
-        return img, mask
-
-    def __len__(self):
-        return len(self.names)
-
-
-class SirstAugDataset_512(Data.Dataset):
-    def __init__(self, base_dir='/data/panpw/works/Infrared/All_ISTD/datasets/SIRST_8000', mode='train'):
-        assert mode in ['train', 'test']
-
-        if mode == 'train':
-            self.data_dir = osp.join(base_dir, 'trainval')
-        elif mode == 'test':
-            self.data_dir = osp.join(base_dir, 'test')
-        else:
-            raise NotImplementedError
-
-        self.names = []
-        for filename in os.listdir(osp.join(self.data_dir, 'images')):
-            if filename.endswith('png'):
-                self.names.append(filename)
-
-        self.transform = transforms.Compose([
-            transforms.Resize((512, 512)),
-            transforms.ToTensor(),
-            # Default mean and std
-            transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
-        ])
-
-        self.transform1 = transforms.Compose([
-            transforms.Resize((512, 512)),
-            transforms.ToTensor(),
-        ])
-
-    def __getitem__(self, i):
-        name = self.names[i]
-        img_path = osp.join(self.data_dir, 'images', name)
-        label_path = osp.join(self.data_dir, 'masks', name)
-
-        img = Image.open(img_path).convert('RGB')
-        mask = Image.open(label_path)
-        img, mask = self.transform(img), self.transform1(mask)
         return img, mask
 
     def __len__(self):
