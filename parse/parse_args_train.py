@@ -11,16 +11,17 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Infrared Small Target Detection')
     parser.add_argument('--model', type=str, default='AGPCNet', help='select in the model folder')
 
-    parser.add_argument('--dataset', type=str, default='NUAA',
+    parser.add_argument('--dataset', type=str, default='SIRST_AUG',
                         help='NUAA, SIRST_AUG, SIRST_4M, IRSTD-1k')
     parser.add_argument('--base_size', type=int, default=256, help='base image size')
     parser.add_argument('--crop_size', type=int, default=256, help='crop image size')
-    parser.add_argument('--num_workers', type=int, default=4, metavar='N', help='dataloader threads')
+    parser.add_argument('--data_aug', type=bool, default=False,  help='data augmentation')
+    parser.add_argument('--num_workers', type=int, default=8, metavar='N', help='dataloader threads')
 
     parser.add_argument('--result_from', type=bool, default=False)
     parser.add_argument('--checkpoint', type=str, default='NUAA_AGPCNet(Res34)_2022_09_14_19_26_47')
 
-    parser.add_argument('--epochs', type=int, default=800, metavar='N',
+    parser.add_argument('--epochs', type=int, default=500, metavar='N',
                         help='number of epochs to train (default: 500)')
     parser.add_argument('--train_batch', type=int, default=16,
                         metavar='N', help='input batch size for training')
@@ -31,7 +32,8 @@ def parse_args():
                         help='Adam, Adagrad and so on')
     parser.add_argument('--lr', type=float, default=0.05, metavar='LR',
                         help='learning rate')
-    parser.add_argument('--scheduler', default='CosineAnnealingLR',
+    parser.add_argument('--warmup', type=bool, default=True)
+    parser.add_argument('--scheduler', default='PolyLR',
                         choices=['CosineAnnealingLR', 'PolyLR'],
                         help='ExtraParam: CosineAnnealingLR: min_lr || PolyLR: power')
     parser.add_argument('--sche_power', default=1.0,
@@ -39,7 +41,7 @@ def parse_args():
     parser.add_argument('--use_outer_init', type=bool, default=False)
     parser.add_argument('--gpus', type=str, default='0',
                         help='Training with GPUs, you can specify 1,3 for example')
-    parser.add_argument("--local_rank", type=int, default=-1)
-    parser.add_argument("---num_gpu", type=int, default=1)
+    parser.add_argument("--local_rank", type=int, default=0)
+    parser.add_argument("---num_gpu", type=int, default=2)
     args = parser.parse_args()
     return args

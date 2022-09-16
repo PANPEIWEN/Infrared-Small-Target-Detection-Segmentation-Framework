@@ -5,7 +5,7 @@
 # @Software: PyCharm
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '5,6'
 
 from torch.nn import init
 import torch.distributed
@@ -39,7 +39,7 @@ class Train(object):
             random_seed(42)
 
         data = build_dataset(args.dataset, args.base_size, args.crop_size, args.num_workers, args.train_batch,
-                             args.test_batch, args.local_rank)
+                             args.test_batch, args.local_rank, args.data_aug)
         if args.local_rank != -1:
             self.train_sample, self.train_data, self.test_data, self.train_data_len, self.test_data_len = data
         else:
@@ -70,7 +70,8 @@ class Train(object):
         print("Model Initializing")
         self.criterion = build_criterion(args.criterion)
         self.optimizer = build_optimizer(args.optimizer, self.model, args.lr)
-        self.scheduler = build_scheduler(args.scheduler, self.optimizer, args.epochs, args.lr, **sche_dict(args))
+        self.scheduler = build_scheduler(args.scheduler, self.optimizer, args.epochs, args.lr, args.warmup,
+                                         **sche_dict(args))
 
         self.iou_metric = SigmoidMetric()
         self.nIoU_metric = SamplewiseSigmoidMetric(1, score_thresh=0.5)
@@ -111,6 +112,7 @@ class Train(object):
         # tbar = tqdm(self.train_data)
         if args.local_rank != -1:
             self.train_sample.set_epoch(epoch)
+        self.scheduler.step(epoch - 1)
         for i, (img, mask) in enumerate(self.train_data):
             if args.local_rank != -1:
                 img = img.cuda()
@@ -138,7 +140,6 @@ class Train(object):
                 save_train_log(self.save_dir, epoch, args.epochs, i + 1,
                                self.train_data_len / args.train_batch / args.num_gpu,
                                np.mean(losses))
-        self.scheduler.step(epoch)
         if args.local_rank <= 0:
             save_ckpt({
                 'epoch': epoch,

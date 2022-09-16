@@ -6,11 +6,11 @@
 from utils.scheduler import *
 
 
-def build_scheduler(scheduler_name, optimizer, num_epochs, base_lr, **kwargs):
+def build_scheduler(scheduler_name, optimizer, num_epochs, base_lr, warm_up=True, **kwargs):
     if scheduler_name == 'CosineAnnealingLR':
-        scheduler = CosineAnnealingLR(optimizer, num_epochs, base_lr, **kwargs)
+        scheduler = CosineAnnealingLR(optimizer, num_epochs, base_lr, warm_up, **kwargs)
     elif scheduler_name == 'PolyLR':
-        scheduler = PolyLR(optimizer, num_epochs, base_lr, **kwargs)
+        scheduler = PolyLR(optimizer, num_epochs, base_lr, warm_up, **kwargs)
     else:
         assert 'Scheduler: ' + scheduler_name + ' is not defined'
     return scheduler
