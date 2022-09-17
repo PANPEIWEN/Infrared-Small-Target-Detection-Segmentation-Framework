@@ -15,6 +15,9 @@ def parse_args():
     parser.add_argument('--base_size', type=int, default=256, help='base image size')
     parser.add_argument('--crop_size', type=int, default=256, help='crop image size')
     parser.add_argument('--data_aug', type=bool, default=True,  help='data augmentation')
+    parser.add_argument('--suffix', type=str, default='png')
+    parser.add_argument('--base_dir', type=str, default='/data1/ppw/works/All_ISTD/datasets',
+                        help='your dataset directory')
     parser.add_argument('--num_workers', type=int, default=8, metavar='N', help='dataloader threads')
 
     parser.add_argument('--result_from', type=bool, default=False)

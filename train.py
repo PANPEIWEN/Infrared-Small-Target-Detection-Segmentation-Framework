@@ -39,7 +39,7 @@ class Train(object):
             random_seed(42)
 
         data = build_dataset(args.dataset, args.base_size, args.crop_size, args.num_workers, args.train_batch,
-                             args.test_batch, args.local_rank, args.data_aug)
+                             args.test_batch, args.local_rank, args.base_dir, args.data_aug, args.suffix)
         if args.local_rank != -1:
             self.train_sample, self.train_data, self.test_data, self.train_data_len, self.test_data_len = data
         else:
@@ -168,6 +168,8 @@ class Train(object):
         self.ROC.reset()
         eval_losses = []
         # tbar = tqdm(self.test_data)
+        # TODO Fix the verification bug, when using DDP,
+        #  only len(test_data)/num_gpus data is verified for each verification
         with torch.no_grad():
             for i, (img, mask) in enumerate(self.test_data):
                 if args.local_rank != -1:

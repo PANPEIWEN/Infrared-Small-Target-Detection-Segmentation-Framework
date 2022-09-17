@@ -8,9 +8,12 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
 
-def build_dataset(dataset_name, base_size, crop_size, num_workers, train_batch, test_batch, local_rank, data_aug=True):
-    trainset = DatasetLoad(dataset_name, base_size, crop_size, 'train', data_aug=data_aug)
-    testset = DatasetLoad(dataset_name, base_size, crop_size, 'test', data_aug=data_aug)
+def build_dataset(dataset_name, base_size, crop_size, num_workers,
+                  train_batch, test_batch, local_rank, base_dir, data_aug=True, suffix='png'):
+    trainset = DatasetLoad(dataset_name, base_size, crop_size, 'train',
+                           data_aug=data_aug, suffix=suffix, base_dir=base_dir)
+    testset = DatasetLoad(dataset_name, base_size, crop_size, 'test',
+                          data_aug=data_aug, suffix=suffix, base_dir=base_dir)
     if local_rank != -1:
         train_sample = DistributedSampler(trainset)
         train_data = DataLoader(dataset=trainset, batch_size=train_batch, sampler=train_sample,
