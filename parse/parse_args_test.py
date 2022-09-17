@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=500, metavar='N',
                         help='number of epochs to train (use to save log)')
     parser.add_argument('--gpus', type=str, default='0',
-                        help='Training with GPUs, you can specify 1,3 for example.')
+                        help='Select gpu to test')
 
     parser.add_argument('--ROC_thr', type=int, default=10, help='crop image size')
 
