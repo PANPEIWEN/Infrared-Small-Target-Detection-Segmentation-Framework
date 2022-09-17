@@ -49,7 +49,7 @@ def save_test_log(save_dir, epoch, epochs, loss, mIoU, nIoU, f1, best_miou, best
     return
 
 
-def save_result_for_test(save_dir, st_model, epochs, mIoU, nIoU, recall, precision, FA, PD, datatset, f1):
+def save_result_for_test(save_dir, st_model, mIoU, nIoU, recall, precision, FA, PD, datatset, f1):
     with open('work_dirs/%s/test_log.txt' % save_dir, 'a') as f:
         now = datetime.now()
         dt_string = now.strftime("%Y/%m/%d  %H:%M:%S")
@@ -57,8 +57,6 @@ def save_result_for_test(save_dir, st_model, epochs, mIoU, nIoU, recall, precisi
         f.write('\n')
         f.write("Model: " + st_model + '\n')
         f.write("Dataset: " + datatset + '\n')
-        f.write('Epoch: %d' % (epochs))
-        f.write('\n')
         f.write('mIoU: %.4f  nIoU: %.4f  F1-score: %.4f' % (mIoU, nIoU, f1))
         f.write('\n')
         f.write('Recall-----:')
