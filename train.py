@@ -5,10 +5,10 @@
 # @Software: PyCharm
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '5,6'
-
-from torch.nn import init
+os.environ['CUDA_VISIBLE_DEVICES'] = '6'
 import torch.distributed
+import torch.nn
+from torch.utils.tensorboard import SummaryWriter
 
 from utils.metric import *
 from utils.logs import *
@@ -27,7 +27,7 @@ from build.build_scheduler import build_scheduler
 class Train(object):
     def __init__(self, args):
         super(Train, self).__init__()
-
+        self.num_gpus = torch.cuda.device_count()
         if args.local_rank != -1:
             device = torch.device('cuda', args.local_rank)
             torch.cuda.set_device(args.local_rank)
@@ -35,7 +35,7 @@ class Train(object):
             random_seed(42)
         else:
             self.device = torch.device(
-                'cuda:%s' % args.gpus if torch.cuda.is_available() else 'cpu')
+                'cuda:0' if torch.cuda.is_available() else 'cpu')
             random_seed(42)
 
         data = build_dataset(args.dataset, args.base_size, args.crop_size, args.num_workers, args.train_batch,
@@ -59,7 +59,7 @@ class Train(object):
                 self.save_dir = make_dir(args.dataset, args.model)
         if args.local_rank <= 0:
             save_train_args_log(args, self.save_dir)
-
+        self.write = SummaryWriter(log_dir='work_dirs/' + self.save_dir + '/tf_logs')
         if args.local_rank != -1:
             self.model.to(device)
             self.model = torch.nn.parallel.DistributedDataParallel(
@@ -101,7 +101,7 @@ class Train(object):
 
     def weight_init(self, m):
         if isinstance(m, nn.Conv2d):
-            init.xavier_normal(m.weight.data)
+            nn.init.xavier_normal(m.weight.data)
         elif isinstance(m, nn.BatchNorm2d):
             nn.init.normal_(m.weight, 1.0, 0.02)
             nn.init.normal_(m.bias, 0)
@@ -134,11 +134,11 @@ class Train(object):
             losses.append(loss.item())
             if args.local_rank <= 0:
                 msg = 'Epoch %d/%d, Iter %d/%d, train loss %.4f, lr %.5f' % (
-                    epoch, args.epochs, i + 1, self.train_data_len / args.train_batch / args.num_gpu,
+                    epoch, args.epochs, i + 1, self.train_data_len / args.train_batch / self.num_gpus,
                     np.mean(losses), self.optimizer.state_dict()['param_groups'][0]['lr'])
                 print(msg)
                 save_train_log(self.save_dir, epoch, args.epochs, i + 1,
-                               self.train_data_len / args.train_batch / args.num_gpu,
+                               self.train_data_len / args.train_batch / self.num_gpus,
                                np.mean(losses))
         if args.local_rank <= 0:
             save_ckpt({
@@ -156,8 +156,10 @@ class Train(object):
                 'nIoU': self.nIoU,
                 'f1': self.f1
             }, save_path='work_dirs/' + self.save_dir, filename='current.pth.tar')
-        self.train_loss.append(np.mean(losses))
-        self.num_epoch.append(epoch)
+            self.train_loss.append(np.mean(losses))
+            self.num_epoch.append(epoch)
+            self.write.add_scalar('train/train_loss', np.mean(losses), epoch)
+            self.write.add_scalar('train/lr', self.optimizer.state_dict()['param_groups'][0]['lr'], epoch)
 
     def testing(self, epoch):
         self.model.eval()
@@ -200,10 +202,6 @@ class Train(object):
             self.mIoU.append(IoU)
             self.nIoU.append(nIoU)
             self.f1.append(F1_score)
-            if args.local_rank <= 0:
-                drawing_loss(self.num_epoch, self.train_loss, self.test_loss, self.save_dir)
-                drawing_iou(self.num_epoch, self.mIoU, self.nIoU, self.save_dir)
-                drawing_f1(self.num_epoch, self.f1, self.save_dir)
             if IoU > self.best_mIoU or nIoU > self.best_nIoU:
                 if args.local_rank <= 0:
                     save_ckpt({
@@ -214,9 +212,17 @@ class Train(object):
                         'nIoU': nIoU,
                         'f1': F1_score
                     }, save_path='work_dirs/' + self.save_dir, filename='best.pth.tar')
-            self.best_mIoU = max(IoU, self.best_mIoU)
-            self.best_nIoU = max(nIoU, self.best_nIoU)
-            self.best_f1 = max(F1_score, self.best_f1)
+            if args.local_rank <= 0:
+                drawing_loss(self.num_epoch, self.train_loss, self.test_loss, self.save_dir)
+                drawing_iou(self.num_epoch, self.mIoU, self.nIoU, self.save_dir)
+                drawing_f1(self.num_epoch, self.f1, self.save_dir)
+                self.best_mIoU = max(IoU, self.best_mIoU)
+                self.best_nIoU = max(nIoU, self.best_nIoU)
+                self.best_f1 = max(F1_score, self.best_f1)
+                self.write.add_scalar('train/test_loss', np.mean(eval_losses), epoch)
+                self.write.add_scalar('test/mIoU', IoU, epoch)
+                self.write.add_scalar('test/nIoU', nIoU, epoch)
+                self.write.add_scalar('test/F1-score', F1_score, epoch)
 
 
 def main(args):
