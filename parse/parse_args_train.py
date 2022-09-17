@@ -34,9 +34,11 @@ def parse_args():
     parser.add_argument('--warmup', type=bool, default=True)
     parser.add_argument('--scheduler', default='PolyLR',
                         choices=['CosineAnnealingLR', 'PolyLR'],
-                        help='ExtraParam: CosineAnnealingLR: min_lr || PolyLR: power')
-    parser.add_argument('--sche_power', default=1.0,
-                        type=float, help='minimum learning rate')
+                        help='ExtraParam: CosineAnnealingLR: min_lr || PolyLR: power'
+                             'You can use the format: " sche_ " to set the parameters in the scheduler'
+                             'sample: Set the parameter: power in PolyLR, you just need to add:' 
+                             '>>> parser.add_argument("--sche_power", default=1.0, type=float)')
+    parser.add_argument('--sche_power', default=1.0, type=float, help='power')
     parser.add_argument('--use_outer_init', type=bool, default=False)
     parser.add_argument('--gpus', type=str, default='0',
                         help='Training with GPUs, you can specify 1,3 for example'
