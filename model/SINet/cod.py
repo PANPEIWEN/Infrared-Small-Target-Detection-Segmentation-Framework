@@ -211,7 +211,7 @@ class SINet(nn.Module):
         S_3 = ra2_feat + guidance_4
         S_3_pred = F.interpolate(S_3, scale_factor=8, mode='bilinear')   # Sup-4 (bs, 1, 44, 44) -> (bs, 1, 352, 352)
 
-        return S_g_pred, S_5_pred, S_4_pred, S_3_pred
+        return S_3_pred
 
 
 if __name__ == '__main__':

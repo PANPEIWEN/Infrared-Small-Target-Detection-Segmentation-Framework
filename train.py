@@ -178,10 +178,7 @@ class Train(object):
                 else:
                     img = img.to(self.device)
                     mask = mask.to(self.device)
-                if args.model == 'SINet':
-                    _, _, _, pred = self.model(img)
-                else:
-                    pred = self.model(img)
+                pred = self.model(img)
                 loss = self.criterion(pred, mask)
                 eval_losses.append(loss.item())
                 self.iou_metric.update(pred, mask)

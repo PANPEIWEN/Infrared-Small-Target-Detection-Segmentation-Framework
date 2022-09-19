@@ -43,10 +43,7 @@ class Test(object):
             for i, (data, labels) in enumerate(tbar):
                 data = data.to(self.device)
                 labels = labels.to(self.device)
-                if args.model == 'SINet':
-                    _, _, _, pred = self.model(data)
-                else:
-                    pred = self.model(data)
+                pred = self.model(data)
                 loss = self.criterion(pred, labels)
                 losses.append(loss.item())
                 self.ROC.update(pred, labels)
