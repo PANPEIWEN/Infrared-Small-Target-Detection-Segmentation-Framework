@@ -24,18 +24,15 @@ A general framework for infrared small target detection and segmentation. By mod
 &emsp;&emsp;......
 ## Training
 ### Single GPU Training
-```python train.py```
+```python train.py <CONFIG_FILE>```
 ### Multi GPU Training
 ```nproc_per_node``` is the number of gpus you are using.  
 
-```python -m torch.distributed.launch --nproc_per_node=2 train.py```
+```python -m torch.distributed.launch --nproc_per_node=2 train.py <CONFIG_FILE>```
 ### Notes
 * You can specify the GPU at the second line of ```os.environ['CUDA_VISIBLE_DEVICES']``` in train.py.
 * Be sure to set args.local_rank to 0 if using Multi-GPU training.
 ## Test
-```python test.py```
-## Visualization
-You can set parameters in parse_args_test.py.
+```python test.py <CONFIG_FILE> <SEG_CHECKPOINT_FILE>```
 
-```python visualization.py```
 ## The tutorial and code are being improved...
