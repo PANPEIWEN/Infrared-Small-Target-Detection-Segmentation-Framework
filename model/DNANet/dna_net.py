@@ -99,7 +99,7 @@ class Res_CBAM_block(nn.Module):
 
 
 class DNANet(nn.Module):
-    def __init__(self, num_classes, input_channels, block, num_blocks, nb_filter, deep_supervision=False):
+    def __init__(self, num_classes, input_channels, block_name, num_blocks, nb_filter, deep_supervision=False, **kwargs):
         super(DNANet, self).__init__()
         self.relu = nn.ReLU(inplace=True)
         self.deep_supervision = deep_supervision
@@ -111,6 +111,7 @@ class DNANet(nn.Module):
         self.up_8 = nn.Upsample(scale_factor=8, mode='bilinear', align_corners=True)
         self.up_16 = nn.Upsample(scale_factor=16, mode='bilinear', align_corners=True)
 
+        block = Res_CBAM_block if block_name == 'resnet' else VGG_CBAM_Block
         self.conv0_0 = self._make_layer(block, input_channels, nb_filter[0])
         self.conv1_0 = self._make_layer(block, nb_filter[0], nb_filter[1], num_blocks[0])
         self.conv2_0 = self._make_layer(block, nb_filter[1], nb_filter[2], num_blocks[1])

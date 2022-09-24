@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from skimage import measure
-from parse.parse_args_test import parse_args
 
 
 class SigmoidMetric():
@@ -175,7 +174,7 @@ class ROCMetric():
 
 
 class PD_FA():
-    def __init__(self, nclass, bins):
+    def __init__(self, nclass, bins, cfg):
         super(PD_FA, self).__init__()
         self.nclass = nclass
         self.bins = bins
@@ -184,16 +183,16 @@ class PD_FA():
         self.FA = np.zeros(self.bins + 1)
         self.PD = np.zeros(self.bins + 1)
         self.target = np.zeros(self.bins + 1)
-        self.args = parse_args()
+        self.cfg = cfg
 
     def update(self, preds, labels):
 
         for iBin in range(self.bins + 1):
             score_thresh = iBin * (255 / self.bins)
             predits = np.array((preds > score_thresh).cpu()).astype('int64')
-            predits = np.reshape(predits, (self.args.crop_size, self.args.crop_size))
+            predits = np.reshape(predits, (self.cfg.data['crop_size'], self.cfg.data['crop_size']))
             labelss = np.array((labels).cpu()).astype('int64')  # P
-            labelss = np.reshape(labelss, (self.args.crop_size, self.args.crop_size))
+            labelss = np.reshape(labelss, (self.cfg.data['crop_size'], self.cfg.data['crop_size']))
 
             image = measure.label(predits, connectivity=2)
             coord_image = measure.regionprops(image)
@@ -229,7 +228,7 @@ class PD_FA():
 
     def get(self, img_num):
 
-        Final_FA = self.FA / ((self.args.crop_size * self.args.crop_size) * img_num)
+        Final_FA = self.FA / ((self.cfg.data['crop_size'] * self.cfg.data['crop_size']) * img_num)
         Final_PD = self.PD / self.target
 
         return Final_FA, Final_PD

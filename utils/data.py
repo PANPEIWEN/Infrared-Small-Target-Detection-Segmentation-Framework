@@ -15,17 +15,17 @@ import numpy as np
 
 
 class DatasetLoad(Data.Dataset):
-    def __init__(self, dataset_name, base_size, crop_size, mode, data_aug=True, suffix='png',
-                 base_dir='/data1/ppw/works/All_ISTD/datasets'):
+    def __init__(self, data_root, base_size, crop_size, mode, train_dir, test_dir, data_aug=True, suffix='png',
+                 **kwargs):
         self.base_size = base_size
         self.crop_size = crop_size
         self.mode = mode
         self.data_aug = data_aug
         assert mode in ['train', 'test'], 'The mode should be train or test'
         if mode == 'train':
-            self.data_dir = osp.join(base_dir, dataset_name, 'trainval')
+            self.data_dir = osp.join(data_root, train_dir)
         else:
-            self.data_dir = osp.join(base_dir, dataset_name, 'test')
+            self.data_dir = osp.join(data_root, test_dir)
 
         self.img_names = []
         for img in os.listdir(osp.join(self.data_dir, 'images')):

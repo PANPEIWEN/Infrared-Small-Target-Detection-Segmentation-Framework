@@ -5,12 +5,11 @@
 # @Software: PyCharm
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
-class SoftLoULoss(nn.Module):
-    def __init__(self):
-        super(SoftLoULoss, self).__init__()
+class SoftIoULoss(nn.Module):
+    def __init__(self, **kwargs):
+        super(SoftIoULoss, self).__init__()
 
     def forward(self, pred, target):
         # Old One
@@ -34,12 +33,22 @@ class SoftLoULoss(nn.Module):
 
 
 class CrossEntropy(nn.Module):
-    def __init__(self):
+    def __init__(self, weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean',
+                 label_smoothing=0.0, **kwargs):
         super(CrossEntropy, self).__init__()
-        self.crit = nn.CrossEntropyLoss()
+        self.crit = nn.CrossEntropyLoss(weight, size_average, ignore_index, reduce, reduction, label_smoothing)
 
     def forward(self, pred, target):
         target.squeeze(dim=1)
         loss = self.crit(pred, target)
         return loss
 
+
+class BCEWithLogits(nn.Module):
+    def __init__(self, weight=None, size_average=None, reduce=None, reduction='mean', pos_weight=None, **kwargs):
+        super(BCEWithLogits, self).__init__()
+        self.crit = nn.BCEWithLogitsLoss(weight, size_average, reduce, reduction, pos_weight)
+
+    def forward(self, pred, target):
+        loss = self.crit(pred, target)
+        return loss

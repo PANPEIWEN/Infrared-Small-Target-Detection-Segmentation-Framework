@@ -3,17 +3,12 @@
 # @Email   : 121106022690@njust.edu.cn
 # @File    : build_criterion.py
 # @Software: PyCharm
-import torch.nn as nn
-from utils.loss import SoftLoULoss, CrossEntropy
+from utils.loss import *
 
 
-def build_criterion(criterion_name):
-    if criterion_name == 'SL':
-        criterion = SoftLoULoss()
-    elif criterion_name == 'BCE':
-        criterion = nn.BCEWithLogitsLoss()
-    elif criterion_name == 'CE':
-        criterion = CrossEntropy()
-    else:
-        assert 'Criterion: ' + criterion_name + ' is not defined'
+#  TODO Multiple loss functions
+def build_criterion(cfg):
+    criterion_name = cfg.model['loss']['type']
+    criterion_class = globals()[criterion_name]
+    criterion = criterion_class(**cfg.model['loss'])
     return criterion

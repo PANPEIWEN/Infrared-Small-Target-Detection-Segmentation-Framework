@@ -23,3 +23,7 @@ def sche_dict(args):
         if k.startswith('sche_'):
             sche[k] = v
     return sche
+
+
+def do_nothing():
+    pass

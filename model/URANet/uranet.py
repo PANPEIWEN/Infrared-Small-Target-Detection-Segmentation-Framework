@@ -141,13 +141,13 @@ class Double_attention(nn.Module):
 
 
 class URANet(nn.Module):
-    def __init__(self, in_c=3, base_dim=32, class_num=1, bilinear=True, use_da=True, norm=nn.BatchNorm2d):
+    def __init__(self, in_channel=3, base_dim=32, class_num=1, bilinear=True, use_da=True, norm=nn.BatchNorm2d, **kwargs):
         super(URANet, self).__init__()
         self.norm = norm
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.conv1 = nn.Sequential(
             # nn.Conv2d(in_c, base_dim, kernel_size=3, padding=1, bias=False),
-            CDC_conv(in_c, base_dim, bias=False),
+            CDC_conv(in_channel, base_dim, bias=False),
             nn.BatchNorm2d(base_dim),
             nn.ReLU(inplace=True),
         )
@@ -186,7 +186,7 @@ class URANet(nn.Module):
 
 def main():
     x = torch.rand(2, 3, 512, 512)
-    net = ura_net()
+    net = URANet()
     out = net(x)
     print(out.shape)
 

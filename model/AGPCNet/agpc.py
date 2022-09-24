@@ -1,7 +1,7 @@
 # @Time    : 2022/5/18 17:25
 # @Author  : PEIWEN PAN
 # @Email   : 121106022690@njust.edu.cn
-# @File    : apgc.py
+# @File    : agpc.py
 # @Software: PyCharm
 import torch
 import torch.nn as nn
@@ -30,7 +30,7 @@ class _FCNHead(nn.Module):
 
 class AGPCNet(nn.Module):
     def __init__(self, backbone='resnet18', scales=(10, 6), reduce_ratios=(8, 8), gca_type='patch', gca_att='origin',
-                 drop=0.1):
+                 drop=0.1, **kwargs):
         super(AGPCNet, self).__init__()
         assert backbone in ['resnet18', 'resnet34']
         assert gca_type in ['patch', 'element']
@@ -81,7 +81,7 @@ class AGPCNet(nn.Module):
 
 class AGPCNet_Pro(nn.Module):
     def __init__(self, backbone='resnet18', scales=(10, 6), reduce_ratios=(8, 8), gca_type='patch', gca_att='origin',
-                 drop=0.1):
+                 drop=0.1, **kwargs):
         super(AGPCNet_Pro, self).__init__()
         assert backbone in ['resnet18', 'resnet34']
         assert gca_type in ['patch', 'element']
@@ -131,7 +131,7 @@ class AGPCNet_Pro(nn.Module):
 
 
 if __name__ == '__main__':
-    model = AGPCNet(backbone='resnet18', scales=(10, 6, 5, 3), reduce_ratios=(16, 4), gca_type='patch', gca_att='post',
+    model = AGPC(backbone='resnet18', scales=(10, 6, 5, 3), reduce_ratios=(16, 4), gca_type='patch', gca_att='post',
                     drop=0.1)
     x = torch.rand(8, 3, 256, 256)
     out = model(x)
