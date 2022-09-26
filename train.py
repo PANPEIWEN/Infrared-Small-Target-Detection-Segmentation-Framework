@@ -6,6 +6,7 @@
 import argparse
 import os
 import time
+
 # TODO Specify GPU issues
 os.environ['CUDA_VISIBLE_DEVICES'] = '6'
 import torch.distributed
@@ -157,7 +158,7 @@ class Train(object):
                 if (i + 1) % self.cfg.log_config['interval'] == 0:
                     save_train_log(self.save_dir, self.train_log_file, epoch, self.cfg.runner['max_epochs'], i + 1,
                                    self.train_data_len / self.cfg.data['train_batch'] / self.num_gpus,
-                                   np.mean(losses), time_elapsed)
+                                   np.mean(losses), self.optimizer.state_dict()['param_groups'][0]['lr'], time_elapsed)
         if args.local_rank <= 0:
             ckpt_info = {
                 'epoch': epoch,

@@ -43,12 +43,13 @@ def save_train_args_log(args, save_dir):
     return
 
 
-def save_train_log(save_dir, file_name, epoch, epochs, iter, iters, loss, time):
+def save_train_log(save_dir, file_name, epoch, epochs, iter, iters, loss, lr, time):
     with open('work_dirs/%s/%s/train_log.txt' % (save_dir, file_name), 'a') as f:
         now = datetime.now()
         dt_string = now.strftime("%Y/%m/%d  %H:%M:%S  ")
         f.write(dt_string)
-        f.write('Epoch: [%d/%d]  Iter[%d/%d]  Loss: %.4f  Time: %.5f' % (epoch, epochs, iter, iters, loss, time))
+        f.write('Epoch: [%d/%d]  Iter[%d/%d]  Loss: %.4f  Lr: %.5f  Time: %.5f'
+                % (epoch, epochs, iter, iters, loss, lr, time))
         f.write('\n')
     return
 
