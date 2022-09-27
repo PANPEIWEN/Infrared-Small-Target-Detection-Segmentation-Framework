@@ -45,6 +45,7 @@ class Test(object):
     def __init__(self, args, cfg):
         super(Test, self).__init__()
         self.cfg = cfg
+        self.deep_supervision = 'deep_supervision' in self.cfg.model['decode_head']
         cfg.data['test_batch'] = 1
         self.save_dir = args.work_dir if args.work_dir else os.path.dirname(os.path.abspath(args.checkpoint))
         self.show_dir = args.show_dir if args.show_dir else os.path.join(self.save_dir, 'show')
@@ -73,20 +74,27 @@ class Test(object):
             for i, (data, labels) in enumerate(tbar):
                 data = data.to(self.device)
                 labels = labels.to(self.device)
-                pred = self.model(data)
-                loss = self.criterion(pred, labels)
+                preds = self.model(data)
+                if self.deep_supervision and self.cfg.model['decode_head']['deep_supervision']:
+                    loss = []
+                    for pre in preds:
+                        loss.append(self.criterion(pre, labels))
+                    loss = sum(loss)
+                    preds = preds[-1]
+                else:
+                    loss = self.criterion(preds, labels)
                 losses.append(loss.item())
-                self.ROC.update(pred, labels)
-                self.mIoU_metric.update(pred, labels)
-                self.nIoU_metric.update(pred, labels)
-                self.PD_FA.update(pred, labels)
+                self.ROC.update(preds, labels)
+                self.mIoU_metric.update(preds, labels)
+                self.nIoU_metric.update(preds, labels)
+                self.PD_FA.update(preds, labels)
                 _, mIoU = self.mIoU_metric.get()
                 _, nIoU = self.nIoU_metric.get()
                 ture_positive_rate, false_positive_rate, recall, precision, F1_score = self.ROC.get()
                 tbar.set_description(
                     'Loss %.4f, mIoU %.4f, nIoU %.4f, F1-score %.4f' % (np.mean(losses), mIoU, nIoU, F1_score))
                 if args.show:
-                    save_Pred_GT(pred, labels, self.show_dir, num, cfg)
+                    save_Pred_GT(preds, labels, self.show_dir, num, cfg)
                     num += 1
             FA, PD = self.PD_FA.get(self.img_num)
             save_test_config(cfg, self.save_dir)

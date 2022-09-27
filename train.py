@@ -63,6 +63,7 @@ class Train(object):
         super(Train, self).__init__()
         self.num_gpus = torch.cuda.device_count() if args.local_rank != -1 else 1
         self.cfg = cfg
+        self.deep_supervision = 'deep_supervision' in self.cfg.model['decode_head']
         if args.local_rank != -1:
             device = torch.device('cuda', args.local_rank)
             torch.cuda.set_device(args.local_rank)
@@ -142,8 +143,14 @@ class Train(object):
             else:
                 img = img.to(self.device)
                 mask = mask.to(self.device)
-            pred = self.model(img)
-            loss = self.criterion(pred, mask)
+            preds = self.model(img)
+            if self.deep_supervision and self.cfg.model['decode_head']['deep_supervision']:
+                loss = []
+                for pre in preds:
+                    loss.append(self.criterion(pre, mask))
+                loss = sum(loss)
+            else:
+                loss = self.criterion(preds, mask)
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
@@ -201,12 +208,19 @@ class Train(object):
                 else:
                     img = img.to(self.device)
                     mask = mask.to(self.device)
-                pred = self.model(img)
-                loss = self.criterion(pred, mask)
+                preds = self.model(img)
+                if self.deep_supervision and self.cfg.model['decode_head']['deep_supervision']:
+                    loss = []
+                    for pre in preds:
+                        loss.append(self.criterion(pre, mask))
+                    loss = sum(loss)
+                    preds = preds[-1]
+                else:
+                    loss = self.criterion(preds, mask)
                 eval_losses.append(loss.item())
-                self.iou_metric.update(pred, mask)
-                self.nIoU_metric.update(pred, mask)
-                self.ROC.update(pred, mask)
+                self.iou_metric.update(preds, mask)
+                self.nIoU_metric.update(preds, mask)
+                self.ROC.update(preds, mask)
                 _, IoU = self.iou_metric.get()
                 _, nIoU = self.nIoU_metric.get()
                 _, _, _, _, F1_score = self.ROC.get()
