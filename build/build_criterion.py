@@ -6,6 +6,8 @@
 from utils.loss import *
 
 
+__all__ = ['CrossEntropy', 'BCEWithLogits', 'SoftIoULoss']
+
 #  TODO Multiple loss functions
 def build_criterion(cfg):
     criterion_name = cfg.model['loss']['type']

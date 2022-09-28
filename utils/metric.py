@@ -11,7 +11,8 @@ from skimage import measure
 
 
 class SigmoidMetric():
-    def __init__(self):
+    def __init__(self, score_thresh=0):
+        self.score_thresh = score_thresh
         self.reset()
 
     def update(self, pred, labels):
@@ -42,7 +43,7 @@ class SigmoidMetric():
         output = output.cpu().detach().numpy()
         target = target.cpu().detach().numpy()
 
-        predict = (output > 0).astype('int64')  # P
+        predict = (output > self.score_thresh).astype('int64')  # P
         pixel_labeled = np.sum(target > 0)  # T
         pixel_correct = np.sum((predict == target) * (target > 0))  # TP
         assert pixel_correct <= pixel_labeled
@@ -52,7 +53,7 @@ class SigmoidMetric():
         mini = 1
         maxi = 1  # nclass
         nbins = 1  # nclass
-        predict = (output.cpu().detach().numpy() > 0).astype('int64')  # P
+        predict = (output.cpu().detach().numpy() > self.score_thresh).astype('int64')  # P
         target = target.cpu().numpy().astype('int64')  # T
         intersection = predict * (predict == target)  # TP
 
