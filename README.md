@@ -68,11 +68,15 @@ for add custom model.
 Please refer
 to [add_dataset.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_dataset.md)
 for add custom dataset.
-### Add custom loss
+### Add loss
 Please refer
 to [add_loss.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_loss.md)
-for add custom loss function.
-### Add custom optimizer and scheduler
+for add loss function.
+
+_Notice: Although you need to use the loss function already in pytorch, you still need to do this._
+### Add optimizer and scheduler
 Please refer
 to [add_optimizer.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_optmizer.md)
-for add custom optimizer and scheduler.
+for add optimizer and scheduler.
+
+_Notice: Although you need to use the optimizer and scheduler already in pytorch, you still need to do this._

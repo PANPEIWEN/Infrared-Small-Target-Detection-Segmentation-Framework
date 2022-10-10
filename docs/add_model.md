@@ -24,12 +24,13 @@ class YourModelName(nn.Module):
        
     """
 
-    def __init__(self, args1, args2, deep_supervision=True, **kwargs):
+    def __init__(self, args1, args2, ..., deep_supervision=True, **kwargs):
         super(YourModelName, self).__init__()
         pass
 
     def forward(self, x):
         pass
+        return outs
 
 ```
 
