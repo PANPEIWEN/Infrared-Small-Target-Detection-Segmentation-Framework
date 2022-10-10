@@ -48,15 +48,15 @@ __all__ = [..., 'YourModelName']
 1. Create a new directory named _yourmodel_ in
    the [configs](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/configs) folder.
 2. Create config file named _yourmodel_base_512x512_800e_nuaa.py_ in the **yourmodel** folder.
-   _Tips: Recommended config file name naming rules:_
+   
+    _Tips: Recommended config file name naming rules:_
    ```[model_name]_[model_scale]_[data_size]_[train_epoch]_[dataset_name]```
 3. Config code specification:
 
 ```python
 """
-In the base is the config you inherited, you can modify the places you need to
-modify after inheritance. For example, you want to modify train and test batch,
-you can write like this:
+In the base is the config you inherited, you can modify the places you need to modify after inheritance.
+For example, you want to modify train and test batch, you can write like this:
     >>> data = dict(
     >>> train_batch=32,
     >>> test_batch=32)
