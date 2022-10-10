@@ -5,7 +5,7 @@
 # @Software: PyCharm
 from utils.scheduler import *
 
-__all__ = ['PolyLR', 'CosineAnnealingLR', 'StepLR']
+__all__ = ['build_scheduler', 'PolyLR', 'CosineAnnealingLR', 'StepLR']
 
 
 # TODO Add scheduler and warmup

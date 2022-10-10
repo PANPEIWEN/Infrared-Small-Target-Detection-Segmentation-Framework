@@ -10,6 +10,9 @@ from model.DNANet.dna_net import DNANet
 from model.URANet.uranet import URANet
 
 
+__all__ = ['Model', 'AGPCNet', 'AGPCNet_Pro', 'ASKCResUNet', 'ASKCResNetFPN', 'DNANet', 'URANet']
+
+
 class Model(nn.Module):
     def __init__(self, cfg):
         super(Model, self).__init__()
