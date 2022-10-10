@@ -5,34 +5,11 @@ adjust various parameters, switch models and datasets, and you can easily add yo
 
 ## The tutorial and code are being improved...
 
-## Dataset Preparation
+## Installation
 
-### File Structure
-
-&emsp;&emsp;----build  
-&emsp;&emsp;......  
-&emsp;&emsp;----datasets  
-&emsp;&emsp;&emsp;----NUAA  
-&emsp;&emsp;&emsp;&emsp;&emsp;----trainval  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;----images  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Misc_1.png  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;......  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;----masks  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Misc_1.png  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;......  
-&emsp;&emsp;&emsp;&emsp;&emsp;----test  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;----images  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Misc_50.png  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;......  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;----masks  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Misc_50.png  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;......  
-&emsp;&emsp;----model  
-&emsp;&emsp;......
-
-### Datasets Link
-
-https://drive.google.com/drive/folders/1RGpVHccGb8B4_spX_RZPEMW9pyeXOIaC?usp=sharing
+Please refer
+to [get_started.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/get_started.md)
+for installation and dataset preparation.
 
 ## Training
 
@@ -78,4 +55,7 @@ For example, test ACM model with fpn, run:
 ```
 python test.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py work_dirs/acm_res20_fpn_512x512_800e_nuaa/20221009_231431/best.pth.tar
 ```
+
 If you want to visualize the result, you only add ```--show``` at the end of the above command.
+
+## Add your own model
