@@ -59,3 +59,6 @@ python test.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py work_dirs/acm_res2
 If you want to visualize the result, you only add ```--show``` at the end of the above command.
 
 ## Add your own model
+Please refer
+to [add_model.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_model.md)
+for add your own model.
