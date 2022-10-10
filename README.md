@@ -27,19 +27,27 @@ A general framework for infrared small target detection and segmentation. By mod
 https://drive.google.com/drive/folders/1RGpVHccGb8B4_spX_RZPEMW9pyeXOIaC?usp=sharing
 ## Training
 ### Single GPU Training
-```python train.py <CONFIG_FILE>```
+```
+python train.py <CONFIG_FILE>
+```
 
 For example, train a ACM model with fpn in single gpu, run:
 
-```python train.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py```
+```
+python train.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py
+```
 ### Multi GPU Training
 ```nproc_per_node``` is the number of gpus you are using.  
 
-```python -m torch.distributed.launch --nproc_per_node=2 train.py <CONFIG_FILE>```
+```
+python -m torch.distributed.launch --nproc_per_node=2 train.py <CONFIG_FILE>
+```
 
 For example, train a ACM model with fpn and 2 gpus, run:
 
-```python -m torch.distributed.launch --nproc_per_node=2 train.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py```
+```
+python -m torch.distributed.launch --nproc_per_node=2 train.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py
+```
 ### Notes
 * You can specify the GPU at the second line of ```os.environ['CUDA_VISIBLE_DEVICES']``` in train.py.
 * Be sure to set args.local_rank to 0 if using Multi-GPU training.
