@@ -23,6 +23,8 @@ A general framework for infrared small target detection and segmentation. By mod
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;......  
 &emsp;&emsp;----model  
 &emsp;&emsp;......
+### Datasets Link
+https://drive.google.com/drive/folders/1RGpVHccGb8B4_spX_RZPEMW9pyeXOIaC?usp=sharing
 ## Training
 ### Single GPU Training
 ```python train.py <CONFIG_FILE>```
