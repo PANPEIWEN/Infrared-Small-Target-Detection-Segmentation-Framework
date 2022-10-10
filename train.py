@@ -8,7 +8,7 @@ import os
 import time
 
 # TODO Specify GPU issues
-os.environ['CUDA_VISIBLE_DEVICES'] = '6'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 import torch.distributed
 import torch.nn
 from torch.utils.tensorboard import SummaryWriter
@@ -63,6 +63,7 @@ class Train(object):
         super(Train, self).__init__()
         self.num_gpus = torch.cuda.device_count() if args.local_rank != -1 else 1
         self.cfg = cfg
+        self.resume = args.resume_from
         self.deep_supervision = 'deep_supervision' in self.cfg.model['decode_head']
         if args.local_rank != -1:
             device = torch.device('cuda', args.local_rank)
@@ -87,6 +88,7 @@ class Train(object):
             checkpoint = torch.load(args.load_from)
             self.model.load_state_dict(checkpoint)
 
+        # FIXME Loss Accuracy Decreases When Use resume_from
         if args.resume_from:
             self.cfg.resume_from = args.resume_from
             checkpoint = torch.load(args.resume_from)
@@ -128,13 +130,13 @@ class Train(object):
         self.f1 = checkpoint['f1'] if args.resume_from else []
         self.num_epoch = checkpoint['num_epoch'] if args.resume_from else []
 
-    # TODO Record the running time of each epoch
     def training(self, epoch):
         self.model.train()
         losses = []
         if args.local_rank != -1:
             self.train_sample.set_epoch(epoch)
-        self.scheduler.step(epoch - 1)
+        if not self.resume:
+            self.scheduler.step(epoch - 1)
         for i, (img, mask) in enumerate(self.train_data):
             since = time.time()
             if args.local_rank != -1:
@@ -144,6 +146,7 @@ class Train(object):
                 img = img.to(self.device)
                 mask = mask.to(self.device)
             preds = self.model(img)
+            # TODO when use deep supervision, should log pred loss, not all loss sum
             if self.deep_supervision and self.cfg.model['decode_head']['deep_supervision']:
                 loss = []
                 for pre in preds:
