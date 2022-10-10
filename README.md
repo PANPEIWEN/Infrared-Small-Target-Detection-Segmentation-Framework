@@ -58,7 +58,21 @@ python test.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py work_dirs/acm_res2
 
 If you want to visualize the result, you only add ```--show``` at the end of the above command.
 
-## Add your own model
+## Framework usage tutorial
+This part explains the config file in detail, which can make you understand the content of the config file more effectively and quickly, and master the overall framework.
+### Add custom model
 Please refer
 to [add_model.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_model.md)
-for add your own model.
+for add custom model.
+### Add custom dataset
+Please refer
+to [add_dataset.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_dataset.md)
+for add custom dataset.
+### Add custom loss
+Please refer
+to [add_loss.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_loss.md)
+for add custom loss function.
+### Add custom optimizer and scheduler
+Please refer
+to [add_optimizer.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_optmizer.md)
+for add custom optimizer and scheduler.

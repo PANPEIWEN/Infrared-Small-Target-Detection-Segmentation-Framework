@@ -1,6 +1,6 @@
-## Add your own model
+## Add Custom Model
 
-You need to follow the process below to add your own model.
+You need to follow the process below to add custom model.
 
 ### Add Model File
 
@@ -87,7 +87,7 @@ model = dict(
     ),
 
     # The type must be the same as your model class name.
-    # The parameters are the parameters inside your model __init__.
+    # The parameters are the parameters inside your model __init__
     decode_head=dict(
         type='YourModelName',
         args1=...,
@@ -96,7 +96,7 @@ model = dict(
         ...
     ),
 
-    # The type must in build_criterion.py with __all__.
+    # The type must in build_criterion.py with __all__
     # If you want to set some parameters, you just need to add a key-value pair after type.
     # For example:
     # >>> loss=dict(type='BCEWithLogits', reduction='mean')
