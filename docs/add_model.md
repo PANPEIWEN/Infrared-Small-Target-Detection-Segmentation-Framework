@@ -62,7 +62,8 @@ For example, you want to modify train and test batch, you can write like this:
     >>> train_batch=32,
     >>> test_batch=32)
 You can use this method flexibly to make the config file more concise.
-It is recommended to use this method to add or modify the places you need to set, instead of modifying the config file in the _base_ folder.
+It is recommended to use this method to add or modify the places you need to set, instead of modifying the
+config file in the _base_ folder.
 """
 _base_ = [
     # dataset config file

@@ -22,8 +22,12 @@ in [utils/scheduler.py](https://github.com/PANPEIWEN/Infrared-Small-Target-Segme
 
 ```python
 class YourScheduler(object):
-    # Where optimizer, base_lr, warmup and warmup_epochs is a necessary parameter, and the default values of warmup and warmup_epochs are None and 0 respectively.
-    # num_epochs represents the total number of epochs for training, not every scheduler requires this parameter, but if it is required, the parameter name must be num_epochs. 
+    """
+    Where optimizer, base_lr, warmup and warmup_epochs is a necessary parameter, and the default values of warmup
+    and warmup_epochs are None and 0 respectively.
+    num_epochs represents the total number of epochs for training, not every scheduler requires this parameter,
+    but if it is required, the parameter name must be num_epochs. 
+    """
     def __init__(self, optimizer, base_lr, num_epochs, args1, args2, ..., warmup=None, warmup_epochs=0, **kwargs):
         super(YourScheduler, self).__init__()
         # The next four lines should be written in this format
@@ -83,13 +87,15 @@ will introduce the configuration file in detail.
 
 ```python
 """
-Since no method has been found to rewrite the optimizer in pytorch, it is recommended to rewrite the optimizer dictionary in the final config file to cover it, which is only for illustration here.
+Since no method has been found to rewrite the optimizer in pytorch, it is recommended to rewrite the optimizer
+dictionary in the final config file to cover it, which is only for illustration here.
 Please refer to docs/add_model.md for details.
 """
 optimizer = dict(
     # The type must in __all__ of build/build_optimizer.py.
     type='SGD',
-    # Set the parameters of the optimizer, since there is no **kwargs parameter, the parameters set here can only be parameters common to all optimizers.
+    # Set the parameters of the optimizer, since there is no **kwargs parameter, the parameters set here can only
+    # be parameters common to all optimizers.
     # So it is recommended to rewrite the optimizer dictionary in the final configuration file to overwrite it.
     setting=dict(lr=0.01)
 )
