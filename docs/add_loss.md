@@ -1,4 +1,4 @@
-## Add Loss
+## Add Loss Function
 
 You need to follow the process below to add loss function.
 
@@ -50,4 +50,6 @@ class BCEWithLogits(nn.Module):
 
 3. Add the loss function class name to \_\_all__ in
    the [build/build_criterion.py](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/build/build_criterion.py)
-   file.
+   file. 
+
+   _How to modify the config file to use loss function, please refer to [docs/add_model.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_model.md)._

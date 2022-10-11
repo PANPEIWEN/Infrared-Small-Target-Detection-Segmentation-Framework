@@ -5,6 +5,9 @@
 # @Software: PyCharm
 from torch.optim import *
 
+__all__ = ['Adagrad', 'Adadelta', 'Adam', 'AdamW', 'Adamax', 'ASGD', 'LBFGS', 'NAdam', 'RAdam', 'RMSprop', 'Rprop',
+           'SGD', 'SparseAdam']
+
 
 # TODO Solve the problem that **kwargs cannot be passed
 def build_optimizer(model, cfg):

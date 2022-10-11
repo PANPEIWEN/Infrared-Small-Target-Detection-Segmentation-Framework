@@ -62,6 +62,7 @@ For example, you want to modify train and test batch, you can write like this:
     >>> train_batch=32,
     >>> test_batch=32)
 You can use this method flexibly to make the config file more concise.
+It is recommended to use this method to add or modify the places you need to set, instead of modifying the config file in the _base_ folder.
 """
 _base_ = [
     # dataset config file
@@ -97,14 +98,14 @@ model = dict(
         ...
     ),
 
-    # The type must in build_criterion.py with __all__
+    # The type must in __all__ of build_criterion.py
     # If you want to set some parameters, you just need to add a key-value pair after type.
     # For example:
     # >>> loss=dict(type='BCEWithLogits', reduction='mean')
     loss=dict(type='SoftIoULoss')
 )
 
-# The type must in torch.optim, you need set parameters in setting.
+# The type must in __all__ of build_optimizer.py, you need set parameters in setting.
 # There cannot be key-value pairs that are not in the optimizer parameter list here.
 optimizer = dict(
     type='SGD',

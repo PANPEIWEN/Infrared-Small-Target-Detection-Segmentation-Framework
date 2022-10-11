@@ -68,7 +68,7 @@ for add custom model.
 Please refer
 to [add_dataset.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_dataset.md)
 for add custom dataset.
-### Add loss
+### Add loss function
 Please refer
 to [add_loss.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_loss.md)
 for add loss function.
