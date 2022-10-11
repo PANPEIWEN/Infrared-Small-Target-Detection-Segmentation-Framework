@@ -104,7 +104,8 @@ optimizer = dict(
 optimizer_config = dict()
 
 """
-Choose your scheduler and warmup strategy, the policy and warmup must in __all__ of build/build_scheduler.py, the first letter is capitalized policy, the first letter is lowercase warmup.
+Choose your scheduler and warmup strategy, the policy and warmup must in __all__ of build/build_scheduler.py,
+the first letter is capitalized policy, the first letter is lowercase warmup.
 The parameters required by scheduler and warmup can be passed in directly by adding key-value pairs.
 """
 lr_config = dict(policy='PolyLR', warmup='linear', power=0.9, min_lr=1e-4, warmup_epochs=5)
