@@ -76,7 +76,7 @@ for add loss function.
 _Notice: Although you need to use the loss function already in pytorch, you still need to do this._
 ### Add optimizer and scheduler
 Please refer
-to [add_optimizer.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_optmizer.md)
+to [add_optimizer.md](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/docs/add_optimizer.md)
 for add optimizer and scheduler.
 
 _Notice: Although you need to use the optimizer and scheduler already in pytorch, you still need to do this._
