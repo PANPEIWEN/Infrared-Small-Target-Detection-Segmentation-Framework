@@ -1,5 +1,11 @@
 ## Installation
-...
+Our config mechanism is based on mmcv, so we need to install the mmcv series package.
+```
+pip install -r requirements.txt
+```
+If you encounter the problem of mmcv-full installation failure, you can refer to https://github.com/open-mmlab/mmcv#installation
+
+After the installation is complete, if other packages are missing during the running process, you can install them directly with pip.
 ## Dataset Preparation
 
 ### File Structure
