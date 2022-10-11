@@ -12,7 +12,7 @@ You need to follow the process below to add optimizer and scheduler.
 ### Add Scheduler
 
 In order to easily combine warmup and scheduler, all our schedulers do not use pytorch, but rewrite them by themselves,
-and do not inherit the loss function in pytorch like some loss functions.
+and do not inherit the scheduler in pytorch like some loss functions.
 
 You need to perform these operations
 in [utils/scheduler.py](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework/blob/main/utils/scheduler.py)
@@ -104,11 +104,11 @@ optimizer = dict(
 optimizer_config = dict()
 
 """
-Choose your scheduler and warmup strategy, the policy and warmup must in __all__ of build/build_scheduler.py,
-the first letter is capitalized policy, the first letter is lowercase warmup.
+Choose your scheduler and warmup strategy, the policy and warmup must in __all__ of build/build_scheduler.py.
+The first letter is uppercase for policy, the first letter is lowercase for warmup.
 The parameters required by scheduler and warmup can be passed in directly by adding key-value pairs.
 """
-lr_config = dict(policy='PolyLR', warmup='linear', power=0.9, min_lr=1e-4, warmup_epochs=5)
+lr_config = dict(policy='PolyLR', warmup='linear', args1=..., args2=..., ...)
 
 # Number of training epochs
 runner = dict(type='EpochBasedRunner', max_epochs=500)

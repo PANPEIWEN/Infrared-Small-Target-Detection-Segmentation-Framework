@@ -20,6 +20,7 @@ class YourLossName(nn.Module):
 
     def forward(self, pred, target):
         pred = torch.sigmoid(pred)
+        loss = ...
         pass
         return loss
 ```

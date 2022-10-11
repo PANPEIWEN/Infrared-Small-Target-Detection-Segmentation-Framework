@@ -13,7 +13,7 @@ You need to follow the process below to add custom model.
 class YourModelName(nn.Module):
     """
     1. You must add **kwargs.
-    2. If you want to use deep_supervision, you can add deep_supervision.
+    2. If you want to use deep_supervision, you can add deep_supervision in __init__.
     Note: That parameter names can only be 'deep_supervision'.
           If you use deep_supervision, the final output must be at the end 
           of the output list, for example:
@@ -23,7 +23,6 @@ class YourModelName(nn.Module):
           >>> return [out1, out2, out] if self.deep_supervision else out
        
     """
-
     def __init__(self, args1, args2, ..., deep_supervision=True, **kwargs):
         super(YourModelName, self).__init__()
         pass
@@ -56,7 +55,7 @@ __all__ = [..., 'YourModelName']
 
 ```python
 """
-In the base is the config you inherited, you can modify the places you need to modify after inheritance.
+In the _base_ is the config you inherited, you can modify the places you need to modify after inheritance.
 For example, you want to modify train and test batch, you can write like this:
     >>> data = dict(
     >>> train_batch=32,

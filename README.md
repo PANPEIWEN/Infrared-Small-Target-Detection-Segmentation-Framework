@@ -1,7 +1,8 @@
 # Infrared-Small-Target-Segmentation-Framework
 
-A general framework for infrared small target detection and segmentation. By modifying the configuration file, you can
-adjust various parameters, switch models and datasets, and you can easily add your own models and datasets.
+A general framework for infrared small target detection and segmentation. By modifying or add the config file, you can
+adjust various parameters, switch models and datasets and so on, and you can easily add your own models and datasets and so on.
+It is recommended to spend a little time reading the [tutorial](https://github.com/PANPEIWEN/Infrared-Small-Target-Segmentation-Framework#framework-usage-tutorial) before use, which can make you master the use of the framework faster.
 
 ## The tutorial and code are being improved...
 
