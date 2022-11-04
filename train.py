@@ -8,7 +8,7 @@ import os
 import time
 
 # TODO Specify GPU issues
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 import torch.distributed
 import torch.nn
 from torch.utils.tensorboard import SummaryWriter
@@ -51,7 +51,7 @@ def parse_args():
              'It also allows nested list/tuple values, e.g. key="[(a,b),(c,d)]" '
              'Note that the quotation marks are necessary and that no white space '
              'is allowed.')
-    parser.add_argument('--local_rank', type=int, default=-1)
+    parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -65,6 +65,7 @@ class Train(object):
         self.cfg = cfg
         self.resume = args.resume_from
         self.deep_supervision = 'deep_supervision' in self.cfg.model['decode_head']
+        self.cfg.gpus = self.num_gpus
         if args.local_rank != -1:
             device = torch.device('cuda', args.local_rank)
             torch.cuda.set_device(args.local_rank)
@@ -113,7 +114,8 @@ class Train(object):
 
         self.criterion = build_criterion(self.cfg)
         self.optimizer = build_optimizer(self.model, self.cfg)
-        self.scheduler = build_scheduler(self.optimizer, self.cfg)
+        if self.cfg.lr_config['policy']:
+            self.scheduler = build_scheduler(self.optimizer, self.cfg)
 
         self.iou_metric = SigmoidMetric()
         self.nIoU_metric = SamplewiseSigmoidMetric(1, score_thresh=0.5)
@@ -135,7 +137,7 @@ class Train(object):
         losses = []
         if args.local_rank != -1:
             self.train_sample.set_epoch(epoch)
-        if not self.resume:
+        if not self.resume and self.cfg.lr_config['policy']:
             self.scheduler.step(epoch - 1)
         for i, (img, mask) in enumerate(self.train_data):
             since = time.time()
@@ -242,8 +244,8 @@ class Train(object):
             self.mIoU.append(IoU)
             self.nIoU.append(nIoU)
             self.f1.append(F1_score)
-            if IoU > self.best_mIoU or nIoU > self.best_nIoU:
-                # FIXME save model
+            # TODO Optimize saving model code
+            if IoU > self.best_mIoU:
                 if args.local_rank <= 0:
                     save_ckpt({
                         'epoch': epoch,
@@ -253,7 +255,18 @@ class Train(object):
                         'mIoU': IoU,
                         'nIoU': nIoU,
                         'f1': F1_score
-                    }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best.pth.tar')
+                    }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best_mIoU.pth.tar')
+            if nIoU > self.best_nIoU:
+                if args.local_rank <= 0:
+                    save_ckpt({
+                        'epoch': epoch,
+                        'state_dict': self.model.module.state_dict()
+                        if args.local_rank != -1 else self.model.state_dict(),
+                        'loss': np.mean(eval_losses),
+                        'mIoU': IoU,
+                        'nIoU': nIoU,
+                        'f1': F1_score
+                    }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best_nIoU.pth.tar')
             if args.local_rank <= 0:
                 drawing_loss(self.num_epoch, self.train_loss, self.test_loss, self.save_dir, self.train_log_file)
                 drawing_iou(self.num_epoch, self.mIoU, self.nIoU, self.save_dir, self.train_log_file)
