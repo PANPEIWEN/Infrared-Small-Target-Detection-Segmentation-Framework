@@ -240,13 +240,23 @@ class Train(object):
                 print(msg)
                 save_test_log(self.save_dir, self.train_log_file, epoch, self.cfg.runner['max_epochs'],
                               np.mean(eval_losses), IoU, nIoU, F1_score, self.best_mIoU, self.best_nIoU, self.best_f1)
-            self.test_loss.append(np.mean(eval_losses))
-            self.mIoU.append(IoU)
-            self.nIoU.append(nIoU)
-            self.f1.append(F1_score)
-            # TODO Optimize saving model code
-            if IoU > self.best_mIoU:
-                if args.local_rank <= 0:
+                self.test_loss.append(np.mean(eval_losses))
+                self.mIoU.append(IoU)
+                self.nIoU.append(nIoU)
+                self.f1.append(F1_score)
+                # TODO Optimize saving model code
+                if IoU > self.best_mIoU or nIoU > self.best_nIoU:
+                    # FIXME save model
+                    save_ckpt({
+                        'epoch': epoch,
+                        'state_dict': self.model.module.state_dict()
+                        if args.local_rank != -1 else self.model.state_dict(),
+                        'loss': np.mean(eval_losses),
+                        'mIoU': IoU,
+                        'nIoU': nIoU,
+                        'f1': F1_score
+                    }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best.pth.tar')
+                if IoU > self.best_mIoU:
                     save_ckpt({
                         'epoch': epoch,
                         'state_dict': self.model.module.state_dict()
@@ -256,8 +266,7 @@ class Train(object):
                         'nIoU': nIoU,
                         'f1': F1_score
                     }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best_mIoU.pth.tar')
-            if nIoU > self.best_nIoU:
-                if args.local_rank <= 0:
+                if nIoU > self.best_nIoU:
                     save_ckpt({
                         'epoch': epoch,
                         'state_dict': self.model.module.state_dict()
@@ -267,7 +276,6 @@ class Train(object):
                         'nIoU': nIoU,
                         'f1': F1_score
                     }, save_path='work_dirs/' + self.save_dir + '/' + self.train_log_file, filename='best_nIoU.pth.tar')
-            if args.local_rank <= 0:
                 drawing_loss(self.num_epoch, self.train_loss, self.test_loss, self.save_dir, self.train_log_file)
                 drawing_iou(self.num_epoch, self.mIoU, self.nIoU, self.save_dir, self.train_log_file)
                 drawing_f1(self.num_epoch, self.f1, self.save_dir, self.train_log_file)
