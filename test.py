@@ -4,6 +4,10 @@
 # @File    : test.py
 # @Software: PyCharm
 import argparse
+import time
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 from mmcv import Config
 from tqdm import tqdm
 from build.build_model import build_model
@@ -31,7 +35,7 @@ def parse_args():
     parser.add_argument(
         '--gpu-id',
         type=int,
-        default=0,
+        default=4,
         help='id of gpu to use '
              '(only applicable to non-distributed testing)')
     parser.add_argument('--local_rank', type=int, default=-1)
@@ -65,10 +69,12 @@ class Test(object):
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         checkpoint = torch.load(args.checkpoint)
         self.model.load_state_dict(checkpoint['state_dict'])
+        print("Model Initializing")
         self.model = self.model.to(self.device)
         self.model.eval()
         tbar = tqdm(self.test_data)
         losses = []
+
         with torch.no_grad():
             num = 0
             for i, (data, labels) in enumerate(tbar):
@@ -98,7 +104,8 @@ class Test(object):
                     num += 1
             FA, PD = self.PD_FA.get(self.img_num)
             save_test_config(cfg, self.save_dir)
-            save_result_for_test(self.save_dir, mIoU, nIoU, recall, precision, FA, PD, F1_score)
+            save_result_for_test(self.save_dir, mIoU, nIoU, recall, precision, FA, PD, F1_score, ture_positive_rate,
+                                 false_positive_rate)
             if args.show:
                 total_show_generation(self.show_dir, cfg)
                 print('Finishing')
@@ -112,5 +119,4 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
     main(args)

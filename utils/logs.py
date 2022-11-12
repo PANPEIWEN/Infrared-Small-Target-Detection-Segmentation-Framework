@@ -66,7 +66,7 @@ def save_test_log(save_dir, file_name, epoch, epochs, loss, mIoU, nIoU, f1, best
     return
 
 
-def save_result_for_test(save_dir, mIoU, nIoU, recall, precision, FA, PD, f1):
+def save_result_for_test(save_dir, mIoU, nIoU, recall, precision, FA, PD, f1, tp, fp):
     with open('%s/test_log.txt' % save_dir, 'a') as f:
         now = datetime.now()
         dt_string = now.strftime("%Y/%m/%d  %H:%M:%S")
@@ -84,6 +84,18 @@ def save_result_for_test(save_dir, mIoU, nIoU, recall, precision, FA, PD, f1):
         for i in range(len(precision)):
             f.write('   ')
             f.write(str(round(precision[i], 8)))
+            f.write('   ')
+        f.write('\n')
+        f.write('TP---------:')
+        for i in range(len(tp)):
+            f.write('   ')
+            f.write(str(round(tp[i], 8)))
+            f.write('   ')
+        f.write('\n')
+        f.write('FP---------:')
+        for i in range(len(fp)):
+            f.write('   ')
+            f.write(str(round(fp[i], 8)))
             f.write('   ')
         f.write('\n')
         f.write('PD---------:')
