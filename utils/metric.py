@@ -157,12 +157,12 @@ class ROCMetric():
             self.class_pos[iBin] += i_class_pos
 
     def get(self):
-        tp_rates = self.tp_arr / (self.pos_arr + 0.00001)
-        fp_rates = self.fp_arr / (self.neg_arr + 0.00001)
+        tp_rates = self.tp_arr / (self.pos_arr + 0.001)
+        fp_rates = self.fp_arr / (self.neg_arr + 0.001)
 
-        recall = self.tp_arr / (self.pos_arr + 0.00001)
-        precision = self.tp_arr / (self.class_pos + 0.00001)
-        f1_score = (2.0 * recall[5] * precision[5]) / (recall[5] + precision[4] + 0.00001)
+        recall = self.tp_arr / (self.pos_arr + 0.001)
+        precision = self.tp_arr / (self.class_pos + 0.001)
+        f1_score = (2.0 * recall[5] * precision[5]) / (recall[5] + precision[5] + 0.00001)
 
         return tp_rates, fp_rates, recall, precision, f1_score
 

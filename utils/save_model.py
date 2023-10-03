@@ -51,18 +51,18 @@ def save_model_and_result(dt_string, epoch, train_loss, test_loss, best_iou, rec
         f.write('\n')
 
 
-def save_model(mean_IOU, best_iou, save_dir, save_prefix, train_loss, test_loss, recall, precision, epoch, net):
-    if mean_IOU > best_iou:
-        save_mIoU_dir = 'work_dirs/' + save_dir + '/' + save_prefix + '_best_IoU_IoU.log'
-        save_other_metric_dir = 'work_dirs/' + save_dir + \
-                                '/' + save_prefix + '_best_IoU_other_metric.log'
-        now = datetime.now()
-        dt_string = now.strftime("%Y/%m/%d  %H:%M:%S")
-        best_iou = mean_IOU
-        save_model_and_result(dt_string, epoch, train_loss, test_loss, best_iou, recall, precision, save_mIoU_dir,
-                              save_other_metric_dir)
-        save_ckpt({'epoch': epoch,
-                   'state_dict': net,
-                   'loss': test_loss,
-                   'mean_IOU': mean_IOU, }, save_path='work_dirs/' + save_dir,
-                  filename='mIoU_' + save_prefix + '_epoch' + '.pth.tar')
+# def save_model(mean_IOU, best_iou, save_dir, save_prefix, train_loss, test_loss, recall, precision, epoch, net):
+#     if mean_IOU > best_iou:
+#         save_mIoU_dir = 'work_dirs/' + save_dir + '/' + save_prefix + '_best_IoU_IoU.log'
+#         save_other_metric_dir = 'work_dirs/' + save_dir + \
+#                                 '/' + save_prefix + '_best_IoU_other_metric.log'
+#         now = datetime.now()
+#         dt_string = now.strftime("%Y/%m/%d  %H:%M:%S")
+#         best_iou = mean_IOU
+#         save_model_and_result(dt_string, epoch, train_loss, test_loss, best_iou, recall, precision, save_mIoU_dir,
+#                               save_other_metric_dir)
+#         save_ckpt({'epoch': epoch,
+#                    'state_dict': net,
+#                    'loss': test_loss,
+#                    'mean_IOU': mean_IOU, }, save_path='work_dirs/' + save_dir,
+#                   filename='mIoU_' + save_prefix + '_epoch' + '.pth.tar')

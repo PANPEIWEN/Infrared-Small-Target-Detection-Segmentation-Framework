@@ -14,7 +14,6 @@ def save_config_log(cfg, save_dir, file_name):
         f.write('\n')
     return
 
-
 def save_test_config(cfg, save_dir):
     with open('%s/test_log.txt' % save_dir, 'a') as f:
         f.write('config_file = ' + cfg.filename)
@@ -42,6 +41,11 @@ def save_train_args_log(args, save_dir):
         f.write('\n')
     return
 
+
+def save_model_struct(save_dir, file_name, model):
+    with open('work_dirs/%s/%s/model.txt' % (save_dir, file_name), 'a') as f:
+        f.write(str(model))
+    return
 
 def save_train_log(save_dir, file_name, epoch, epochs, iter, iters, loss, lr, time):
     with open('work_dirs/%s/%s/train_log.txt' % (save_dir, file_name), 'a') as f:

@@ -7,6 +7,7 @@ import os
 import shutil
 
 import numpy as np
+import torch
 from PIL import Image
 from matplotlib import pyplot as plt
 
@@ -29,6 +30,7 @@ def save_Pred_GT(pred, labels, show_dir, num, cfg):
     val_img_ids = []
     for img in img_name:
         val_img_ids.append(img.split('.')[0])
+    # predsss = ((torch.sigmoid((pred)).cpu().numpy()) * 255).astype('int64')
     predsss = np.array((pred > 0).cpu()).astype('int64') * 255
     predsss = np.uint8(predsss)
     labelsss = labels * 255
@@ -83,7 +85,7 @@ def total_show_generation(show_dir, cfg):
         plt.subplot(1, 3, 1)
         img = plt.imread(show_dir + '/result/' + ids[m] + '.' + cfg.data['suffix'])
         plt.imshow(img, cmap='gray')
-        plt.xlabel("Raw Imamge", size=11)
+        plt.xlabel("Raw Image", size=11)
 
         plt.subplot(1, 3, 2)
         img = plt.imread(show_dir + '/result/' + ids[m] + '_GT' + '.' + cfg.data['suffix'])

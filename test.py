@@ -1,10 +1,9 @@
-# @Time    : 2022/4/6 21:16
+# @Time    : 2023/10/1 20:01
 # @Author  : PEIWEN PAN
 # @Email   : 121106022690@njust.edu.cn
-# @File    : test.py
+# @File    : rebuild_test.py
 # @Software: PyCharm
 import argparse
-import time
 import os
 
 from mmcv import Config
@@ -12,9 +11,8 @@ from tqdm import tqdm
 from build.build_model import build_model
 from build.build_criterion import build_criterion
 from build.build_dataset import build_dataset
+import logging
 
-from utils.metric import *
-from utils.logs import *
 from utils.visual import *
 from utils.tools import *
 
@@ -52,7 +50,7 @@ class Test(object):
         cfg.data['test_batch'] = 1
         self.save_dir = args.work_dir if args.work_dir else os.path.dirname(os.path.abspath(args.checkpoint))
         self.show_dir = args.show_dir if args.show_dir else os.path.join(self.save_dir, 'show')
-        make_show_dir(self.show_dir) if args.show else do_nothing()
+        make_show_dir(self.show_dir) if args.show else empty_function()
         _, self.test_data, _, self.img_num = build_dataset(args, self.cfg)
         self.criterion = build_criterion(self.cfg)
         self.model = build_model(self.cfg)
@@ -73,33 +71,28 @@ class Test(object):
         self.model.eval()
         tbar = tqdm(self.test_data)
         losses = []
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%F %T')
 
         with torch.no_grad():
             num = 0
-            for i, (data, labels) in enumerate(tbar):
-                data = data.to(self.device)
-                labels = labels.to(self.device)
-                preds = self.model(data)
-                if self.deep_supervision and self.cfg.model['decode_head']['deep_supervision']:
-                    loss = []
-                    for pre in preds:
-                        loss.append(self.criterion(pre, labels))
-                    loss = sum(loss)
-                    preds = preds[-1]
-                else:
-                    loss = self.criterion(preds, labels)
+            for i, (img, mask) in enumerate(tbar):
+                img, mask = data2device(args, (img, mask), self.device)
+                preds = self.model(img)
+                loss, preds = compute_loss(preds, mask, self.deep_supervision, cfg, self.criterion)
                 losses.append(loss.item())
-                self.ROC.update(preds, labels)
-                self.mIoU_metric.update(preds, labels)
-                self.nIoU_metric.update(preds, labels)
-                self.PD_FA.update(preds, labels)
+
+                self.ROC.update(preds, mask)
+                self.mIoU_metric.update(preds, mask)
+                self.nIoU_metric.update(preds, mask)
+                self.PD_FA.update(preds, mask)
                 _, mIoU = self.mIoU_metric.get()
                 _, nIoU = self.nIoU_metric.get()
                 ture_positive_rate, false_positive_rate, recall, precision, F1_score = self.ROC.get()
+
                 tbar.set_description(
                     'Loss %.4f, mIoU %.4f, nIoU %.4f, F1-score %.4f' % (np.mean(losses), mIoU, nIoU, F1_score))
                 if args.show:
-                    save_Pred_GT(preds, labels, self.show_dir, num, cfg)
+                    save_Pred_GT(preds, mask, self.show_dir, num, cfg)
                     num += 1
             FA, PD = self.PD_FA.get(self.img_num)
             save_test_config(cfg, self.save_dir)
@@ -107,8 +100,8 @@ class Test(object):
                                  false_positive_rate)
             if args.show:
                 total_show_generation(self.show_dir, cfg)
-                print('Finishing')
-            print('mIoU: %.4f, nIoU: %.4f, F1-score: %.4f' % (mIoU, nIoU, F1_score))
+                logging.info('Finishing')
+            logging.info('mIoU: %.4f, nIoU: %.4f, F1-score: %.4f' % (mIoU, nIoU, F1_score))
 
 
 def main(args):
