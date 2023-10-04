@@ -1,3 +1,5 @@
+# The current code is too bloated, and we're refactoring the code, which will be released soon, and more models will be integrated. 💦💦💦🍺🍺🍺🚀🚀🚀
+
 # Infrared-Small-Target-Segmentation-Framework
 
 A general framework for infrared small target detection and segmentation. By modifying or add the config file, you can
