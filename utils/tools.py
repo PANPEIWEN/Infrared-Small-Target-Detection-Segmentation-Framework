@@ -99,7 +99,7 @@ def init_devices(args, cfg):
         torch.distributed.init_process_group(backend=cfg.dist_params['backend'])
     else:
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    random_seed(42)
+    random_seed(cfg.random_seed)
     return device
 
 
