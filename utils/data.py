@@ -86,7 +86,7 @@ class DatasetLoad(Data.Dataset):
         img_path = osp.join(self.data_dir, 'images', img_name)
         label_path = osp.join(self.data_dir, 'masks', img_name)
         img = Image.open(img_path).convert('RGB')
-        mask = Image.open(label_path)
+        mask = Image.open(label_path).convert('L')
         img, mask = self._sync_transform(img, mask)
         return img, mask
 
