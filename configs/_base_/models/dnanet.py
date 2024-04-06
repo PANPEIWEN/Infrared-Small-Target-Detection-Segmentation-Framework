@@ -1,8 +1,3 @@
-_base_ = [
-    '../_base_/datasets/nuaa.py',
-    '../_base_/default_runtime.py',
-    '../_base_/schedules/schedule_500e.py'
-]
 # model settings
 model = dict(
     name='DNANet',
@@ -17,13 +12,8 @@ model = dict(
         num_classes=1,
         input_channels=3,
         block_name='resnet',
-        num_blocks=[1, 1, 1, 1],
+        num_blocks=[2, 2, 2, 2],
         nb_filter=[16, 32, 64, 128, 256]
     ),
     loss=dict(type='SoftIoULoss')
 )
-optimizer = dict(
-    type='Adagrad',
-    setting=dict(lr=0.05, weight_decay=1e-4)
-)
-runner = dict(type='EpochBasedRunner', max_epochs=800)

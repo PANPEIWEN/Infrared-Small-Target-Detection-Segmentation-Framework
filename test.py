@@ -5,13 +5,11 @@
 # @Software: PyCharm
 import argparse
 import os
-
 from mmcv import Config
 from tqdm import tqdm
 from build.build_model import build_model
 from build.build_criterion import build_criterion
 from build.build_dataset import build_dataset
-import logging
 
 from utils.visual import *
 from utils.tools import *
@@ -32,7 +30,7 @@ def parse_args():
     parser.add_argument(
         '--gpu-id',
         type=int,
-        default=4,
+        default=0,
         help='id of gpu to use '
              '(only applicable to non-distributed testing)')
     parser.add_argument('--local_rank', type=int, default=-1)
@@ -45,9 +43,9 @@ def parse_args():
 class Test(object):
     def __init__(self, args, cfg):
         super(Test, self).__init__()
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%F %T')
         self.cfg = cfg
         self.deep_supervision = 'deep_supervision' in self.cfg.model['decode_head']
-        cfg.data['test_batch'] = 1
         self.save_dir = args.work_dir if args.work_dir else os.path.dirname(os.path.abspath(args.checkpoint))
         self.show_dir = args.show_dir if args.show_dir else os.path.join(self.save_dir, 'show')
         make_show_dir(self.show_dir) if args.show else empty_function()
@@ -62,19 +60,18 @@ class Test(object):
         self.best_precision = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.mIoU_metric.reset()
         self.nIoU_metric.reset()
+        self.PD_FA.reset()
 
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         checkpoint = torch.load(args.checkpoint)
         self.model.load_state_dict(checkpoint['state_dict'])
-        print("Model Initializing")
+        logging.info("Model Initializing")
         self.model = self.model.to(self.device)
         self.model.eval()
         tbar = tqdm(self.test_data)
         losses = []
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%F %T')
 
         with torch.no_grad():
-            num = 0
             for i, (img, mask) in enumerate(tbar):
                 img, mask = data2device(args, (img, mask), self.device)
                 preds = self.model(img)
@@ -88,12 +85,10 @@ class Test(object):
                 _, mIoU = self.mIoU_metric.get()
                 _, nIoU = self.nIoU_metric.get()
                 ture_positive_rate, false_positive_rate, recall, precision, F1_score = self.ROC.get()
-
                 tbar.set_description(
                     'Loss %.4f, mIoU %.4f, nIoU %.4f, F1-score %.4f' % (np.mean(losses), mIoU, nIoU, F1_score))
                 if args.show:
-                    save_Pred_GT(preds, mask, self.show_dir, num, cfg)
-                    num += 1
+                    save_Pred_GT(preds, mask, self.show_dir, cfg.data['test_batch'] * i, cfg)
             FA, PD = self.PD_FA.get(self.img_num)
             save_test_config(cfg, self.save_dir)
             save_result_for_test(self.save_dir, mIoU, nIoU, recall, precision, FA, PD, F1_score, ture_positive_rate,

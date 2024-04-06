@@ -1,5 +1,5 @@
 _base_ = [
-    'dnanet_res10_512x512_800e_nuaa'
+    'dnanet_res10_512x512_800e_nuaa.py'
 ]
 # model settings
 model = dict(

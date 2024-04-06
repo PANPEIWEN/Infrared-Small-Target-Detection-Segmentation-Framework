@@ -6,3 +6,4 @@ model = dict(
     decode_head=dict(
         backbone='resnet34')
 )
+data = dict(train_batch=4)

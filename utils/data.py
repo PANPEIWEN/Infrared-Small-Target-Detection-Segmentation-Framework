@@ -17,11 +17,12 @@ import math
 
 class DatasetLoad(Data.Dataset):
     def __init__(self, data_root, base_size, crop_size, mode, train_dir, test_dir, data_aug=True, suffix='png',
-                 **kwargs):
+                 rgb=True, **kwargs):
         self.base_size = base_size
         self.crop_size = crop_size
         self.mode = mode
         self.data_aug = data_aug
+        self.rgb = rgb
         assert mode in ['train', 'test'], 'The mode should be train or test'
         if mode == 'train':
             self.data_dir = osp.join(data_root, train_dir)
@@ -33,9 +34,14 @@ class DatasetLoad(Data.Dataset):
             if img.endswith(suffix):
                 self.img_names.append(img)
 
-        self.transform = transforms.Compose([
+        self.rgb_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
+        ])
+
+        self.gray_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([-0.1246], [1.0923])
         ])
 
     def _sync_transform(self, img, mask):
@@ -46,7 +52,7 @@ class DatasetLoad(Data.Dataset):
             crop_size = self.crop_size
             long_size = random.randint(
                 int(self.base_size * 0.5), int(self.base_size * 2.0))
-                # int(self.base_size * 0.8), int(self.base_size * 1.2))
+            # int(self.base_size * 0.8), int(self.base_size * 1.2))
             w, h = img.size
             if h > w:
                 oh = long_size
@@ -71,13 +77,13 @@ class DatasetLoad(Data.Dataset):
             if random.random() < 0.5:
                 img = img.filter(ImageFilter.GaussianBlur(radius=random.random()))
             img, mask = np.array(img), np.array(mask)
-            img = self.transform(img)
+            img = self.rgb_transform(img) if self.rgb else self.gray_transform(img)
             mask = transforms.ToTensor()(mask)
         else:
             img = img.resize((self.base_size, self.base_size), Image.BILINEAR)
             mask = mask.resize((self.base_size, self.base_size), Image.NEAREST)
             img, mask = np.array(img), np.array(mask)
-            img = self.transform(img)
+            img = self.rgb_transform(img) if self.rgb else self.gray_transform(img)
             mask = transforms.ToTensor()(mask)
         return img, mask
 
@@ -85,7 +91,7 @@ class DatasetLoad(Data.Dataset):
         img_name = self.img_names[item]
         img_path = osp.join(self.data_dir, 'images', img_name)
         label_path = osp.join(self.data_dir, 'masks', img_name)
-        img = Image.open(img_path).convert('RGB')
+        img = Image.open(img_path).convert('RGB') if self.rgb else Image.open(img_path).convert('L')
         mask = Image.open(label_path).convert('L')
         img, mask = self._sync_transform(img, mask)
         return img, mask

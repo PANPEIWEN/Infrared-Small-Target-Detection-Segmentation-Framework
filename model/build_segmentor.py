@@ -9,9 +9,12 @@ from model.ACM.acm import ASKCResNetFPN, ASKCResUNet
 from model.DNANet.dna_net import DNANet
 from model.URANet.uranet import URANet
 from model.ABC.ABCNet import ABCNet
+from model.RDIAN.rdian import RDIAN
+from model.MTUet.mtu_uet import MTUNet
+from model.UIUNet.uiunet import UIUNet
 
 
-__all__ = ['Model', 'AGPCNet', 'AGPCNet_Pro', 'ASKCResUNet', 'ASKCResNetFPN', 'DNANet', 'URANet', 'ABCNet']
+__all__ = ['Model', 'AGPCNet', 'AGPCNet_Pro', 'ASKCResUNet', 'ASKCResNetFPN', 'DNANet', 'URANet', 'ABCNet', 'RDIAN', 'MTUNet', 'UIUNet']
 
 
 class Model(nn.Module):

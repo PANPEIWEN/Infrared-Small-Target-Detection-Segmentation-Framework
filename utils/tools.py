@@ -74,7 +74,6 @@ def init_model(args, cfg, model, device):
         checkpoint = torch.load(args.load_from)
         model.load_state_dict(checkpoint)
 
-    # FIXME Loss Accuracy Decreases When Use resume_from
     if args.resume_from:
         cfg.resume_from = args.resume_from
         checkpoint = torch.load(args.resume_from)
@@ -84,7 +83,8 @@ def init_model(args, cfg, model, device):
     if args.local_rank != -1:
         model.to(device)
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+            model, device_ids=[args.local_rank], output_device=args.local_rank,
+            find_unused_parameters=cfg.find_unused_parameters)
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     else:
         model = model.to(device)
@@ -130,7 +130,6 @@ def data2device(args, data, device):
 
 
 def compute_loss(preds, mask, deep_supervision, cfg, criterion):
-    # TODO when use deep supervision, should log pred loss, not all loss sum
     if deep_supervision and cfg.model['decode_head']['deep_supervision']:
         loss = []
         for pre in preds:
@@ -253,4 +252,3 @@ def draw(args, metrics, save_dir, train_log_file):
         drawing_loss(metrics['num_epoch'], metrics['train_loss'], metrics['test_loss'], save_dir, train_log_file)
         drawing_iou(metrics['num_epoch'], metrics['mIoU'], metrics['nIoU'], save_dir, train_log_file)
         drawing_f1(metrics['num_epoch'], metrics['f1'], save_dir, train_log_file)
-

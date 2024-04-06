@@ -39,13 +39,13 @@ class Layernorm(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-    def __init__(self, in_c, out_c, norm=nn.BatchNorm2d):
+    def __init__(self, in_c, out_c, theta=0.7, norm=nn.BatchNorm2d):
         super().__init__()
         self.conv_block = nn.Sequential(
-            nn.Conv2d(in_c, out_c, kernel_size=3, padding=1, bias=False if norm == nn.BatchNorm2d else True),
+            nn.Conv2d(in_c, out_c, kernel_size=3, padding=1, theta=theta, bias=False if norm == nn.BatchNorm2d else True),
             norm(out_c),
             nn.ReLU(inplace=True),
-            CDC_conv(out_c, out_c, kernel_size=3, padding=1, bias=False if norm == nn.BatchNorm2d else True),
+            CDC_conv(out_c, out_c, kernel_size=3, padding=1, theta=theta, bias=False if norm == nn.BatchNorm2d else True),
             norm(out_c),
         )
         self.residual_block = nn.Sequential(
@@ -141,26 +141,27 @@ class Double_attention(nn.Module):
 
 
 class URANet(nn.Module):
-    def __init__(self, in_channel=3, base_dim=32, class_num=1, bilinear=True, use_da=True, norm=nn.BatchNorm2d, **kwargs):
+    def __init__(self, in_channel=3, base_dim=32, class_num=1, bilinear=True, use_da=True, theta=0.7,
+                 norm=nn.BatchNorm2d, **kwargs):
         super(URANet, self).__init__()
         self.norm = norm
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.conv1 = nn.Sequential(
             # nn.Conv2d(in_c, base_dim, kernel_size=3, padding=1, bias=False),
-            CDC_conv(in_channel, base_dim, bias=False),
+            CDC_conv(in_channel, base_dim, bias=False, theta=theta),
             nn.BatchNorm2d(base_dim),
             nn.ReLU(inplace=True),
         )
         self.conv2 = nn.Sequential(
             # nn.Conv2d(base_dim, base_dim, kernel_size=3, padding=1, bias=False),
-            CDC_conv(base_dim, base_dim, bias=False),
+            CDC_conv(base_dim, base_dim, bias=False, theta=theta),
             nn.BatchNorm2d(base_dim),
             nn.ReLU(inplace=True),
         )
-        self.layer1 = ResidualBlock(base_dim, base_dim * 2, norm=self.norm)
-        self.layer2 = ResidualBlock(base_dim * 2, base_dim * 4, self.norm)
-        self.layer3 = ResidualBlock(base_dim * 4, base_dim * 8, self.norm)
-        self.layer4 = ResidualBlock(base_dim * 8, base_dim * 16, self.norm)
+        self.layer1 = ResidualBlock(base_dim, base_dim * 2, theta=theta, norm=self.norm)
+        self.layer2 = ResidualBlock(base_dim * 2, base_dim * 4, theta=theta, norm=self.norm)
+        self.layer3 = ResidualBlock(base_dim * 4, base_dim * 8, theta=theta, norm=self.norm)
+        self.layer4 = ResidualBlock(base_dim * 8, base_dim * 16, theta=theta, norm=self.norm)
         self.da = Double_attention(base_dim * 16, None) if use_da else nn.Identity()
         self.up3 = UpsampleBlock(base_dim * 16, base_dim * 8, bilinear=bilinear)
         self.up2 = UpsampleBlock(base_dim * 8, base_dim * 4, bilinear=bilinear)

@@ -10,12 +10,14 @@ import os
 
 def save_config_log(cfg, save_dir, file_name):
     with open('work_dirs/%s/%s/train_log.txt' % (save_dir, file_name), 'a') as f:
+        print(cfg.pretty_text)
         f.write(cfg.pretty_text)
         f.write('\n')
     return
 
 def save_test_config(cfg, save_dir):
     with open('%s/test_log.txt' % save_dir, 'a') as f:
+        print(cfg.pretty_text)
         f.write('config_file = ' + cfg.filename)
         f.write('\n')
         f.write(cfg.pretty_text)

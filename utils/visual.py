@@ -25,21 +25,23 @@ def make_show_dir(show_dir):
     os.mkdir(os.path.join(show_dir, 'fuse'))
 
 
-def save_Pred_GT(pred, labels, show_dir, num, cfg):
+def save_Pred_GT(preds, labels, show_dir, num, cfg):
     img_name = os.listdir(os.path.join(cfg.data['data_root'], cfg.data['test_dir'], 'images'))
     val_img_ids = []
     for img in img_name:
         val_img_ids.append(img.split('.')[0])
     # predsss = ((torch.sigmoid((pred)).cpu().numpy()) * 255).astype('int64')
-    predsss = np.array((pred > 0).cpu()).astype('int64') * 255
-    predsss = np.uint8(predsss)
-    labelsss = labels * 255
-    labelsss = np.uint8(labelsss.cpu())
+    batch = preds.size()[0]
+    for b in range(batch):
+        predsss = np.array((preds[b, :, :, :] > 0).cpu()).astype('int64') * 255
+        predsss = np.uint8(predsss)
+        labelsss = labels[b, :, :, :] * 255
+        labelsss = np.uint8(labelsss.cpu())
 
-    img = Image.fromarray(predsss.reshape(cfg.data['crop_size'], cfg.data['crop_size']))
-    img.save(show_dir + '/result/' + '%s_Pred' % (val_img_ids[num]) + '.' + cfg.data['suffix'])
-    img = Image.fromarray(labelsss.reshape(cfg.data['crop_size'], cfg.data['crop_size']))
-    img.save(show_dir + '/result/' + '%s_GT' % (val_img_ids[num]) + '.' + cfg.data['suffix'])
+        img = Image.fromarray(predsss.reshape(cfg.data['crop_size'], cfg.data['crop_size']))
+        img.save(show_dir + '/result/' + '%s_Pred' % (val_img_ids[num + b]) + '.' + cfg.data['suffix'])
+        img = Image.fromarray(labelsss.reshape(cfg.data['crop_size'], cfg.data['crop_size']))
+        img.save(show_dir + '/result/' + '%s_GT' % (val_img_ids[num + b]) + '.' + cfg.data['suffix'])
 
 
 def save_Pred_GT_visulize(pred, img_demo_dir, img_demo_index, suffix, cfg):
