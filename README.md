@@ -33,7 +33,7 @@ python train.py configs/acm/acm_res20_fpn_512x512_800e_nuaa.py
 ```nproc_per_node``` is the number of gpus you are using.
 
 ```
-python -m torch.distributed.launch --nproc_per_node=2 train.py <CONFIG_FILE>
+python -m torch.distributed.launch --nproc_per_node=<GPU NUMS> train.py <CONFIG_FILE>
 ```
 
 For example, train ACM model with fpn and 2 gpus, run:
