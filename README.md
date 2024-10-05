@@ -1,4 +1,4 @@
-# The current code is too bloated, and we're refactoring the code, which will be released soon, and more models will be integrated. 💦💦💦🍺🍺🍺🚀🚀🚀
+# The current code is too bloated, and we are refactoring the code, which will be released soon, and more models will be integrated. 💦💦💦🍺🍺🍺🚀🚀🚀
 
 # Infrared-Small-Target-Segmentation-Framework
 
